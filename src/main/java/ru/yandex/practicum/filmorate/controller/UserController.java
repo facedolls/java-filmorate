@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        checkNameUser(user);
+        setUserNameIfMissing(user);
         if (user.getId() != null) {
             log.warn("An exception \"UserAlreadyExistException\" was thrown for {}", user);
             throw new UserAlreadyExistException("User already exists: " + user);
@@ -34,7 +34,7 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        checkNameUser(user);
+        setUserNameIfMissing(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("Update user: {}", user);
@@ -45,7 +45,7 @@ public class UserController {
         return user;
     }
 
-    private void checkNameUser(User user) {
+    private void setUserNameIfMissing(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             log.debug("The user's empty name {} has been changed to {}", user, user.getLogin());
             user.setName(user.getLogin());
