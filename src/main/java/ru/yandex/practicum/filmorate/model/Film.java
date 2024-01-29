@@ -2,11 +2,12 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.validator.AfterMinDate;
 import java.time.LocalDate;
 
 @Data
 public class Film {
-    private int id;
+    private Integer id;
     @NotNull
     @NotBlank
     private String name;
@@ -14,6 +15,7 @@ public class Film {
     @Size(max = 200)
     private String description;
     @NotNull
+    @AfterMinDate
     private LocalDate releaseDate;
     @Positive
     private int duration;

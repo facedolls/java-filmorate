@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
-import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -22,21 +21,20 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        validationUser(user);
-        generateId(user);
-        if (!users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Added user: {}", user);
-        } else {
+        checkNameUser(user);
+        if (user.getId() != null) {
             log.warn("An exception \"UserAlreadyExistException\" was thrown for {}", user);
             throw new UserAlreadyExistException("User already exists: " + user);
         }
+        user.setId(++id);
+        users.put(user.getId(), user);
+        log.info("Create user: {}", user);
         return user;
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        validationUser(user);
+        checkNameUser(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("Update user: {}", user);
@@ -47,26 +45,10 @@ public class UserController {
         return user;
     }
 
-    private void validationUser(User user) {
-        boolean isNotLogin = user.getLogin().contains(" ");
-        boolean isNotBirthday = user.getBirthday().isAfter(LocalDate.now());
-
-        if (isNotLogin && isNotBirthday) {
-            log.warn("An exception \"ValidationException\" was thrown for {}", user);
-            throw new ValidationException("The user is not validated: " + user);
-        }
-
+    private void checkNameUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
+            log.debug("The user's empty name {} has been changed to {}", user, user.getLogin());
             user.setName(user.getLogin());
-            log.debug("The user's empty name {} has been changed to {}", user, user.getName());
-        }
-    }
-
-    private void generateId(User user) {
-        if (user.getId() == 0) {
-            user.setId(++id);
-        } else {
-            id = user.getId();
         }
     }
 }
