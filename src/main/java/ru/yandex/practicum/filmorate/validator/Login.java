@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = LoginValidator.class)
 public @interface Login {
-    String message() default "Login does not meet the criteria {value}";
+    String message() default "Login must not contain a space";
     Class<?>[] groups() default {};
     Class<?>[] payload() default {};
     String value() default " ";
