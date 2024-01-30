@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import jakarta.validation.*;
 import lombok.extern.slf4j.Slf4j;
+import javax.validation.*;
 import java.time.LocalDate;
 
 @Slf4j
