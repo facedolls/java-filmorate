@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import jakarta.validation.Constraint;
+import javax.validation.Constraint;
 import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)

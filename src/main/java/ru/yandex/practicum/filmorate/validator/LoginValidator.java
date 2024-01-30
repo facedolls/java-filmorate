@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import jakarta.validation.*;
+import javax.validation.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
