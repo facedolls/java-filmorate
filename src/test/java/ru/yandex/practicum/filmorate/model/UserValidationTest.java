@@ -118,10 +118,10 @@ public class UserValidationTest {
                 .andExpect(status().is(400));
     }
 
-    @DisplayName("Должен вернуть код ошибки 400, email пользователя не содержит @ ")
+    @DisplayName("Должен вернуть код ошибки 400 для неправильно сформированного адреса электронной почты")
     @Test
     public void shouldReturnAnErrorCode400ForInvalidEmail() throws Exception {
-        User user = new User(null,"yandex.ru", "gbn3hjk", "Luna",
+        User user = new User(null,"yandex", "gbn3hjk", "Luna",
                 LocalDate.of(1989, 9, 3));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
