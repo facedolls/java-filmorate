@@ -23,7 +23,7 @@ public class UserController {
     public User createUser(@Valid @RequestBody User user) {
         setUserNameIfMissing(user);
         if (user.getId() != null) {
-            log.warn("An exception \"UserAlreadyExistException\" was thrown for {}", user);
+            log.warn("User already exists: {}", user);
             throw new UserAlreadyExistException("User already exists: " + user);
         }
         user.setId(++id);
@@ -39,7 +39,7 @@ public class UserController {
             users.put(user.getId(), user);
             log.info("Update user: {}", user);
         } else {
-            log.warn("An exception \"ValidationException\" was thrown for {}", user);
+            log.warn("Incorrect id passed for: {}", user);
             throw new ValidationException("Incorrect id passed for: " + user);
         }
         return user;
@@ -47,7 +47,7 @@ public class UserController {
 
     private void setUserNameIfMissing(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
-            log.debug("The user's empty name {} has been changed to {}", user, user.getLogin());
+            log.info("The user's empty name {} has been changed to {}", user, user.getLogin());
             user.setName(user.getLogin());
         }
     }

@@ -11,16 +11,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Film {
     private Integer id;
-    @NotNull
     @NotBlank
     private String name;
-    @NotNull
     @NotBlank
     @Size(max = 200)
     private String description;
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @AfterMinDate
+    @AfterMinDate(value = "1895-12-28")
     private LocalDate releaseDate;
     @Positive
     private int duration;

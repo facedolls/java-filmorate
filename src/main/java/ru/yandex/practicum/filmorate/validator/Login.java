@@ -10,5 +10,5 @@ public @interface Login {
     String message() default "Login must not contain a space";
     Class<?>[] groups() default {};
     Class<?>[] payload() default {};
-    String value() default " ";
+    String value() default "";
 }

@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
 
-@RestController()
+@RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
@@ -22,8 +22,8 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         if (film.getId() != null) {
-            log.warn("An exception \"FilmAlreadyExistException\" was thrown for {}: film already exist", film);
-            throw new FilmAlreadyExistException("The film already exist: " + film);
+            log.warn("Film already exist: {}", film);
+            throw new FilmAlreadyExistException("Film already exist: " + film);
         }
         film.setId(++id);
         films.put(film.getId(), film);
@@ -37,7 +37,7 @@ public class FilmController {
             films.put(film.getId(), film);
             log.info("Update film: {}", film);
         } else {
-            log.warn("An exception \"ValidationException\" was thrown for {}: incorrect id passed", film);
+            log.warn("Incorrect id passed for: {}", film);
             throw new ValidationException("Incorrect id passed for: " + film);
         }
         return film;
