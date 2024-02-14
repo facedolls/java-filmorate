@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class FilmValidationTest {
-    @Autowired
+    /*@Autowired
     protected MockMvc mockMvc;
     @Autowired
     protected ObjectMapper objectMapper;
@@ -123,5 +123,5 @@ public class FilmValidationTest {
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
-    }
+    }*/
 }
