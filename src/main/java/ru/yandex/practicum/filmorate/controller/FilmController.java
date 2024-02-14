@@ -1,45 +1,59 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.*;
 
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 @Slf4j
 public class FilmController {
-    private static int id = 0;
-    private Map<Integer, Film> films = new HashMap<>();
+    private final FilmService filmService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> getFilmById(@PathVariable Integer id) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.getFilmById(id));
+    }
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
-        return films.values();
+    public ResponseEntity<Collection<Film>> getAllFilms() {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.getAllFilms());
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<Collection<Film>> getPopularFilm(@RequestParam(defaultValue = "10",
+            required = false) Integer count) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.getPopularFilm(count));
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
-        if (film.getId() != null) {
-            log.warn("Film already exist: {}", film);
-            throw new FilmAlreadyExistException("Film already exist: " + film);
-        }
-        film.setId(++id);
-        films.put(film.getId(), film);
-        log.info("Create film: {}", film);
-        return film;
+    public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.createFilm(film));
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.info("Update film: {}", film);
-        } else {
-            log.warn("Incorrect id passed for: {}", film);
-            throw new ValidationException("Incorrect id passed for: " + film);
-        }
-        return film;
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.updateFilm(film));
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> putLike(@PathVariable Integer id, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.putLike(id, userId));
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> deleteLike(@PathVariable Integer id, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.deleteLike(id, userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFilm(@PathVariable Integer id) {
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.deleteFilm(id));
     }
 }
