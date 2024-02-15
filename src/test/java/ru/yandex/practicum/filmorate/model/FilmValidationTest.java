@@ -34,7 +34,7 @@ public class FilmValidationTest {
                 .andExpect(jsonPath("$.releaseDate").value("2002-11-06"))
                 .andExpect(jsonPath("$.duration").value("110"))
                 .andExpect(jsonPath("$.like").isEmpty())
-                .andExpect(status().is(200));
+                .andExpect(status().is(201));
     }
 
     @DisplayName("Должен вернуть код ошибки 400, имя фильма пустое")

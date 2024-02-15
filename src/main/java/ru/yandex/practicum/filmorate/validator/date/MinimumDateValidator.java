@@ -1,6 +1,8 @@
-package ru.yandex.practicum.filmorate.validator;
+package ru.yandex.practicum.filmorate.validator.date;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.validator.date.AfterMinDate;
+
 import javax.validation.*;
 import java.time.LocalDate;
 

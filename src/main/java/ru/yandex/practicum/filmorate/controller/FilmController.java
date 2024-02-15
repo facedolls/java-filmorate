@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import java.util.*;
 
 @RestController
@@ -18,7 +18,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Film> getFilmById(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.getFilmById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(filmService.checkFilmExistenceAndGetFilmById(id));
     }
 
     @GetMapping
@@ -34,7 +34,7 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.createFilm(film));
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.createFilm(film));
     }
 
     @PutMapping

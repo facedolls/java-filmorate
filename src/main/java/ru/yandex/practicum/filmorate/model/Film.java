@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import javax.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validator.AfterMinDate;
+import ru.yandex.practicum.filmorate.validator.date.AfterMinDate;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;

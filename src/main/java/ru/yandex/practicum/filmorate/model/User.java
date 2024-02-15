@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validator.Login;
+import ru.yandex.practicum.filmorate.validator.login.Login;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
