@@ -34,7 +34,7 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.name").value("Monika"))
                 .andExpect(jsonPath("$.birthday").value("1989-01-19"))
                 .andExpect(jsonPath("$.friends").isEmpty())
-                .andExpect(status().is(200));
+                .andExpect(status().is(201));
     }
 
     @DisplayName("Должен изменить пустое имя пользователя на логин")
@@ -51,7 +51,7 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.name").value("a2sfg2hjk"))
                 .andExpect(jsonPath("$.birthday").value("2000-12-15"))
                 .andExpect(jsonPath("$.friends").isEmpty())
-                .andExpect(status().is(200));
+                .andExpect(status().is(201));
     }
 
     @DisplayName("Должен изменить состоящее из одних пробелов имя пользователя на логин")
@@ -68,7 +68,7 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.name").value("jh9gvc"))
                 .andExpect(jsonPath("$.birthday").value("1999-11-14"))
                 .andExpect(jsonPath("$.friends").isEmpty())
-                .andExpect(status().is(200));
+                .andExpect(status().is(201));
     }
 
     @DisplayName("Должен изменить null имя пользователя на логин")
@@ -85,13 +85,13 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.name").value("lmn8bvc"))
                 .andExpect(jsonPath("$.birthday").value("1998-10-13"))
                 .andExpect(jsonPath("$.friends").isEmpty())
-                .andExpect(status().is(200));
+                .andExpect(status().is(201));
     }
 
     @DisplayName("Должен вернуть код ошибки 400 при наличии в логине пользователя пробела")
     @Test
     public void shouldReturnAnErrorCode400ForALoginContainingASpace() throws Exception {
-        User user = new User( "a@yandex.ru", "k k", "Anita",
+        User user = new User("a@yandex.ru", "k k", "Anita",
                 LocalDate.of(2000, 12, 15));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
