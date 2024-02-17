@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 
 public interface FilmService {
-    Film checkFilmExistenceAndGetFilmById(Integer id);
+    Film getFilmById(Integer id);
 
     Collection<Film> getAllFilms();
 

@@ -4,60 +4,73 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.validator.id.user.CorrectUserId;
 import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.checkUserExistenceAndGetUserById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public User getUserById(@PathVariable @CorrectUserId Long id) {
+        return userService.getUserById(id);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<User>> getAllUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}/friends")
-    public ResponseEntity<Collection<User>> getFriends(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getFriends(id));
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<User> getFriends(@PathVariable @CorrectUserId Long id) {
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<Collection<User>> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getMutualFriends(id, otherId));
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<User> getMutualFriends(@PathVariable @CorrectUserId Long id,
+                                             @PathVariable @CorrectUserId Long otherId) {
+        return userService.getMutualFriends(id, otherId);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@Valid @RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(user));
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUser(@Valid @RequestBody User user) {
+        return userService.updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<String> addInFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addInFriend(id, friendId));
+    @ResponseStatus(HttpStatus.OK)
+    public String addInFriend(@PathVariable @CorrectUserId Long id, @PathVariable @CorrectUserId Long friendId) {
+        return userService.addInFriend(id,  friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<String> deleteForFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteForFriends(id, friendId));
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteForFriends(@PathVariable @CorrectUserId Long id, @PathVariable @CorrectUserId Long friendId) {
+        return userService.deleteForFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteUser(@PathVariable @CorrectUserId Long id) {
+        return userService.deleteUser(id);
     }
 }

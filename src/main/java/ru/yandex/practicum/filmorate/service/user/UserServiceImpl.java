@@ -17,18 +17,16 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     @Override
-    public User checkUserExistenceAndGetUserById(Long id) {
-        if (id == null || id < 1) {
-            log.warn("Incorrect id={} passed for user", id);
-            throw new IncorrectParameterException(String.format("Error with field id=%d for user", id));
+    public User getUserById(Long id) {
+        checkUserExistence(id);
+        return userStorage.getUsersById(id);
+    }
+
+    private void checkUserExistence(Long id) {
+        if (userStorage.getUsersById(id) == null) {
+            log.warn("User with id={} not found", id);
+            throw new UserNotFoundException(String.format("User with id=%d not found", id));
         }
-        return userStorage.getAllUsers().stream()
-                .filter(user -> user.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.warn("User with id={} not found", id);
-                    return new UserNotFoundException(String.format("User with id=%d not found", id));
-                });
     }
 
     @Override
@@ -39,21 +37,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<User> getFriends(Long id) {
-        Set<Long> idFriends = checkUserExistenceAndGetUserById(id).getFriends();
+        Set<Long> idFriends = getUserById(id).getFriends();
         log.info("Received a list of friends for user id={}", id);
         return idFriends.stream()
-                .map(this::checkUserExistenceAndGetUserById)
+                .map(this::getUserById)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<User> getMutualFriends(Long id, Long otherId) {
-        Set<Long> idCommonFriends = checkUserExistenceAndGetUserById(id).getFriends().stream()
-                .filter(checkUserExistenceAndGetUserById(otherId).getFriends()::contains)
+        Set<Long> idCommonFriends = getUserById(id).getFriends().stream()
+                .filter(getUserById(otherId).getFriends()::contains)
                 .collect(Collectors.toSet());
         log.info("Received a list of mutual friends of user id={} and user otherId={}", id, otherId);
         return idCommonFriends.stream()
-                .map(this::checkUserExistenceAndGetUserById)
+                .map(this::getUserById)
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
         setUserNameIfMissing(user);
-        checkUserExistenceAndGetUserById(user.getId());
+        checkUserExistence(user.getId());
         User updatedUser = userStorage.updateUser(user);
         log.info("Update user {}", user);
         return updatedUser;
@@ -87,8 +85,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addInFriend(Long id, Long friendId) {
-        User userFirst = checkUserExistenceAndGetUserById(id);
-        User userSecond = checkUserExistenceAndGetUserById(friendId);
+        User userFirst = getUserById(id);
+        User userSecond = getUserById(friendId);
         userFirst.getFriends().add(friendId);
         userSecond.getFriends().add(id);
         userStorage.updateUser(userFirst);
@@ -99,8 +97,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteForFriends(Long id, Long friendId) {
-        User userFirst = checkUserExistenceAndGetUserById(id);
-        User userSecond = checkUserExistenceAndGetUserById(friendId);
+        User userFirst = getUserById(id);
+        User userSecond = getUserById(friendId);
         userFirst.getFriends().remove(friendId);
         userSecond.getFriends().remove(id);
         userStorage.updateUser(userFirst);
@@ -111,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteUser(Long id) {
-        checkUserExistenceAndGetUserById(id);
+        checkUserExistence(id);
         userStorage.deleteUser(id);
         log.info("User id={} removed", id);
         return String.format("User id=%d deleted", id);

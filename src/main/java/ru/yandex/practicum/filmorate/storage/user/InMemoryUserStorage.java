@@ -10,6 +10,11 @@ public class InMemoryUserStorage implements UserStorage {
     private static long id = 1;
 
     @Override
+    public User getUsersById(Long id) {
+        return users.get(id);
+    }
+
+    @Override
     public Collection<User> getAllUsers() {
         return users.values();
     }
