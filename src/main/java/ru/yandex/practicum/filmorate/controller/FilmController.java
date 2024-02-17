@@ -4,56 +4,68 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.validator.count.CorrectFilmCount;
+import ru.yandex.practicum.filmorate.validator.id.film.CorrectFilmId;
+import ru.yandex.practicum.filmorate.validator.id.user.CorrectUserId;
 import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilmById(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.checkFilmExistenceAndGetFilmById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public Film getFilmById(@PathVariable @CorrectFilmId Integer id) {
+        return filmService.getFilmById(id);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Film>> getAllFilms() {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.getAllFilms());
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getAllFilms() {
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<Collection<Film>> getPopularFilm(@RequestParam(defaultValue = "10",
-            required = false) Integer count) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.getPopularFilm(count));
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getPopularFilm(@RequestParam(defaultValue = "10") @CorrectFilmCount Integer count) {
+        return filmService.getPopularFilm(count);
     }
 
     @PostMapping
-    public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.createFilm(film));
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film createFilm(@Valid @RequestBody Film film) {
+        return filmService.createFilm(film);
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.updateFilm(film));
+    @ResponseStatus(HttpStatus.OK)
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<Film> putLike(@PathVariable Integer id, @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.putLike(id, userId));
+    @ResponseStatus(HttpStatus.OK)
+    public Film putLike(@PathVariable @CorrectFilmId Integer id, @PathVariable @CorrectUserId Long userId) {
+        return filmService.putLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<Film> deleteLike(@PathVariable Integer id, @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.deleteLike(id, userId));
+    @ResponseStatus(HttpStatus.OK)
+    public Film deleteLike(@PathVariable @CorrectFilmId Integer id, @PathVariable @CorrectUserId Long userId) {
+        return filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFilm(@PathVariable Integer id) {
-        return ResponseEntity.status(HttpStatus.OK).body(filmService.deleteFilm(id));
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteFilm(@PathVariable @CorrectFilmId Integer id) {
+        return filmService.deleteFilm(id);
     }
 }

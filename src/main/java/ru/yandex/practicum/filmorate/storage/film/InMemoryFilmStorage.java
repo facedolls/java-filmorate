@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -10,8 +11,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static int id = 1;
 
     @Override
+    public Film getFilmsById(Integer id) {
+        return films.get(id);
+    }
+
+    @Override
     public Collection<Film> getAllFilms() {
         return films.values();
+    }
+
+    @Override
+    public Collection<Film> getPopularFilm(Integer count) {
+        return films.values().stream()
+                .sorted((film1, film2) -> film2.getLike().size() - film1.getLike().size())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     @Override
