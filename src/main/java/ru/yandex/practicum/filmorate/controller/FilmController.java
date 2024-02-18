@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -8,9 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.validator.count.CorrectFilmCount;
-import ru.yandex.practicum.filmorate.validator.id.film.CorrectFilmId;
-import ru.yandex.practicum.filmorate.validator.id.user.CorrectUserId;
 import java.util.*;
 
 @RestController
@@ -23,7 +21,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film getFilmById(@PathVariable @CorrectFilmId Integer id) {
+    public Film getFilmById(@PathVariable @NotNull @Min(1) Integer id) {
         return filmService.getFilmById(id);
     }
 
@@ -35,7 +33,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getPopularFilm(@RequestParam(defaultValue = "10") @CorrectFilmCount Integer count) {
+    public Collection<Film> getPopularFilm(@RequestParam(defaultValue = "10") @Positive Integer count) {
         return filmService.getPopularFilm(count);
     }
 
@@ -53,19 +51,19 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public Film putLike(@PathVariable @CorrectFilmId Integer id, @PathVariable @CorrectUserId Long userId) {
+    public Film putLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.putLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public Film deleteLike(@PathVariable @CorrectFilmId Integer id, @PathVariable @CorrectUserId Long userId) {
+    public Film deleteLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteFilm(@PathVariable @CorrectFilmId Integer id) {
+    public String deleteFilm(@PathVariable @NotNull @Min(1) Integer id) {
         return filmService.deleteFilm(id);
     }
 }
