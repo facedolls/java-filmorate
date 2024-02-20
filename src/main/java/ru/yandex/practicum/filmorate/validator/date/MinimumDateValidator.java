@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.validator;
+package ru.yandex.practicum.filmorate.validator.date;
 
 import lombok.extern.slf4j.Slf4j;
 import javax.validation.*;

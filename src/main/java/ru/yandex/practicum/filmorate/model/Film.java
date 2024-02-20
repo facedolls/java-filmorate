@@ -2,15 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validator.AfterMinDate;
+import ru.yandex.practicum.filmorate.validator.date.AfterMinDate;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@AllArgsConstructor
 public class Film {
-    private Integer id;
+    private int id;
     @NotBlank
     private String name;
     @NotBlank
@@ -22,4 +22,12 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    private Set<Long> like = new HashSet<>();
+
+    public Film(String name, String description, LocalDate releaseDate, int duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 }

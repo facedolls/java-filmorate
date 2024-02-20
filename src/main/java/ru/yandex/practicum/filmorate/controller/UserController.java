@@ -1,54 +1,77 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import java.util.*;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
+@Validated
 @Slf4j
 public class UserController {
-    private static int id = 0;
-    private Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public User getUserById(@PathVariable @NotNull @Min(1) Long id) {
+        return userService.getUserById(id);
+    }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAllUsers() {
-        return users.values();
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<User> getFriends(@PathVariable @NotNull @Min(1) Long id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<User> getMutualFriends(@PathVariable @NotNull @Min(1) Long id,
+                                             @PathVariable @NotNull @Min(1) Long otherId) {
+        return userService.getMutualFriends(id, otherId);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Valid @RequestBody User user) {
-        setUserNameIfMissing(user);
-        if (user.getId() != null) {
-            log.warn("User already exists: {}", user);
-            throw new UserAlreadyExistException("User already exists: " + user);
-        }
-        user.setId(++id);
-        users.put(user.getId(), user);
-        log.info("Create user: {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
     public User updateUser(@Valid @RequestBody User user) {
-        setUserNameIfMissing(user);
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.info("Update user: {}", user);
-        } else {
-            log.warn("Incorrect id passed for: {}", user);
-            throw new ValidationException("Incorrect id passed for: " + user);
-        }
-        return user;
+        return userService.updateUser(user);
     }
 
-    private void setUserNameIfMissing(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("The user's empty name {} has been changed to {}", user, user.getLogin());
-            user.setName(user.getLogin());
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String addInFriend(@PathVariable @NotNull @Min(1) Long id, @PathVariable @NotNull @Min(1) Long friendId) {
+        return userService.addInFriend(id,  friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteForFriends(@PathVariable @NotNull @Min(1) Long id,
+                                   @PathVariable @NotNull @Min(1) Long friendId) {
+        return userService.deleteForFriends(id, friendId);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteUser(@PathVariable @NotNull @Min(1) Long id) {
+        return userService.deleteUser(id);
     }
 }
