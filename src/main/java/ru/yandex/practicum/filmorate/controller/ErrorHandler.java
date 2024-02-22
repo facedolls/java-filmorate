@@ -22,7 +22,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmNotFoundException(final ConstraintViolationException e) {
+    public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
         return new ErrorResponse(e.getMessage());
     }
 }
