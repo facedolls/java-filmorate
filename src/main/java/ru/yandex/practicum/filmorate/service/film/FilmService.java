@@ -10,6 +10,14 @@ public interface FilmService {
 
     Collection<Film> getPopularFilm(Integer count);
 
+    Collection<String> getAllGenres();
+
+    String getGenreById(Integer id);
+
+    Collection<String> getAllMpa();
+
+    String getMpaById(Integer id);
+
     Film createFilm(Film film);
 
     Film updateFilm(Film film);

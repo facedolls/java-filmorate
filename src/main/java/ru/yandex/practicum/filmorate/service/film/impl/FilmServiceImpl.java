@@ -1,10 +1,11 @@
-package ru.yandex.practicum.filmorate.service.film;
+package ru.yandex.practicum.filmorate.service.film.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.Collection;
 
@@ -40,6 +41,24 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
+    public Collection<String> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    @Override
+    public String getGenreById(Integer id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public Collection<String> getAllMpa() {
+        return filmStorage.getAllMpa();
+    }
+
+    public String getMpaById(Integer id) {
+        return filmStorage.getMpaById(id);
+    }
+
+    @Override
     public Film createFilm(Film film) {
         if (film.getId() != 0) {
             log.warn("Film already exist {}", film);
@@ -62,7 +81,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film putLike(Integer id, Long userId) {
         Film film = getFilmById(id);
-        film.getLike().add(userId);
+        film.getLikes().add(userId);
         filmStorage.updateFilm(film);
         log.info("User userId={} liked the film id={}", userId, id);
         return film;
@@ -71,7 +90,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film deleteLike(Integer id, Long userId) {
         Film film = getFilmById(id);
-        film.getLike().remove(userId);
+        film.getLikes().remove(userId);
         filmStorage.updateFilm(film);
         log.info("User id={} removed the like from the film id={}", userId, id);
         return film;

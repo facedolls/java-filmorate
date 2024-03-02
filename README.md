@@ -133,10 +133,10 @@ SELECT * FROM friendship;
 
 **7. Отправление запроса пользователем с id = 5 на добавление пользователя с id = 1 в друзья**
 ```SQL
-INSERT INTO friendship("user_id", "friend_id", "status")
+INSERT INTO friendship ("user_id", "friend_id", "status")
 VALUES (1, 5, false);
 
-INSERT INTO friendship("user_id", "friend_id", "status")
+INSERT INTO friendship ("user_id", "friend_id", "status")
 VALUES (5, 1, false);
 ```
 Результат:
@@ -400,7 +400,7 @@ LIMIT 10;
 
 **16. Добавить лайк фильму с id = 2 от пользователя с id = 1**
 ```SQL
-INSERT INTO like_film("film_id", "user_id")
+INSERT INTO like_film ("film_id", "user_id")
 VALUES (2, 1);
 ```
 Результат:

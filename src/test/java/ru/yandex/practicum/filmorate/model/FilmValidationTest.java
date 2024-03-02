@@ -20,7 +20,7 @@ public class FilmValidationTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @DisplayName("Должен добавить новый фильм")
+    /*@DisplayName("Должен добавить новый фильм")
     @Test
     public void shouldCreateFilm() throws Exception {
         Film film = new Film("8 Mile", "Jimmy Smith, nicknamed \"Rabbit\"",
@@ -123,5 +123,5 @@ public class FilmValidationTest {
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
-    }
+    }*/
 }

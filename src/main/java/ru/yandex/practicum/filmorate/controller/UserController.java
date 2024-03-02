@@ -58,8 +58,9 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public String addInFriend(@PathVariable @NotNull @Min(1) Long id, @PathVariable @NotNull @Min(1) Long friendId) {
-        return userService.addInFriend(id,  friendId);
+    public String addInFriend(@PathVariable @NotNull @Min(1) Long id,
+                              @PathVariable @NotNull @Min(1) Long friendId) {
+        return userService.addInFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
