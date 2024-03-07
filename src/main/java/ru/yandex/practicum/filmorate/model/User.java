@@ -1,16 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.validator.login.Login;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@RequiredArgsConstructor
 public class User {
     private long id;
     @NotBlank
@@ -24,7 +24,7 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past(message = "The date of birth cannot be the future")
     private LocalDate birthday;
-    private Map<Long, Boolean> friends = new HashMap<>();
+    private Set<Long> friends = new HashSet<>();
 
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
@@ -39,5 +39,14 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
+    }
+
+    public User(long id, String email, String login, String name, LocalDate birthday, Set<Long> friends) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friends = friends;
     }
 }

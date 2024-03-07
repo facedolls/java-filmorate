@@ -8,7 +8,7 @@ import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.user.UserServiceDb;
 import java.util.*;
 
 @RestController
@@ -17,7 +17,7 @@ import java.util.*;
 @Validated
 @Slf4j
 public class UserController {
-    private final UserService userService;
+    private final UserServiceDb userService;
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -48,6 +48,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Valid @RequestBody User user) {
         return userService.createUser(user);
+    }
+
+    @PostMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String addFriendRequest(@PathVariable @NotNull @Min(1) Long id,
+                                   @PathVariable @NotNull @Min(1) Long friendId) {
+        return userService.addFriendRequest(id, friendId);
     }
 
     @PutMapping

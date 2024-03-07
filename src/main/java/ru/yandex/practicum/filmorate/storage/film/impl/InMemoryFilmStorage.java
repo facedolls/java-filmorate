@@ -2,17 +2,20 @@ package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
-    private final List<String> genres = Arrays.asList("Комедия", "Драма", "Мультфильм", "Триллер",
-            "Документальный", "Боевик");
-    private final List<String> ratingMpa = Arrays.asList("G", "PG", "PG-13", "R", "NC-17");
+    private final List<Genre> genres = List.of(new Genre(1, "Комедия"), new Genre(2, "Драма"),
+            new Genre(3, "Мультфильм"), new Genre(4, "Триллер"),
+            new Genre(5, "Документальный"), new Genre(6, "Боевик"));
+    private final List<RatingMpa> ratingMpa = List.of(new RatingMpa(1, "G"), new RatingMpa(2, "PG"),
+            new RatingMpa(3, "PG-13"), new RatingMpa(4, "R"), new RatingMpa(5, "NC-17"));
     private static int id = 1;
 
     @Override
@@ -28,26 +31,28 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
         return films.values().stream()
-                .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())
+                .sorted((film1, film2) -> film2.getLike().size() - film1.getLike().size())
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Collection<String> getAllGenres() {
+    public Collection<Genre> getAllGenres() {
         return genres;
     }
 
     @Override
-    public String getGenreById(Integer id) {
+    public Genre getGenreById(Integer id) {
         return genres.get(id - 1);
     }
 
-    public Collection<String> getAllMpa() {
+    @Override
+    public Collection<RatingMpa> getAllMpa() {
         return ratingMpa;
     }
 
-    public String getMpaById(Integer id) {
+    @Override
+    public RatingMpa getMpaById(Integer id) {
         return ratingMpa.get(id - 1);
     }
 
