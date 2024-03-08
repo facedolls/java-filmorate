@@ -73,26 +73,39 @@ public class FilmServiceDbImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
+        isExistsRatingMpa(film);
+
         if (film.getId() != 0) {
             log.warn("Film already exist {}", film);
             throw new FilmAlreadyExistException(String.format(
                     "Film id=%d \"%s\"already exist", film.getId(),film.getName()));
         }
+
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;
     }
 
+    private void isExistsRatingMpa(Film film) {
+        RatingMpa mpa = filmStorage.getMpaById(film.getMpa().getId());
+        if (mpa == null) {
+            log.warn("Rating MPA with id={} not already exist", film.getMpa().getId());
+            throw new ValidationException(String.format(
+                    "Rating MPA with id=%d not already exist", film.getMpa().getId()));
+        }
+    }
+
     @Override
     public Film updateFilm(Film film) {
-        isExistsId(film.getId());
+        isExistsIdFilm(film.getId());
+        isExistsRatingMpa(film);
         Film filmUpdated = filmStorage.updateFilm(film);
         log.info("Update film {}", filmUpdated);
         return filmUpdated;
     }
 
-    private void isExistsId(Integer filmId) {
-        boolean isExists = filmStorage.isExistsId(filmId);
+    private void isExistsIdFilm(Integer filmId) {
+        boolean isExists = filmStorage.isExistsIdFilm(filmId);
         if (!isExists) {
             log.warn("Film with id={} not found", filmId);
             throw new FilmNotFoundException(String.format("Film with id=%d not found", filmId));
@@ -101,21 +114,21 @@ public class FilmServiceDbImpl implements FilmService {
 
     @Override
     public Film putLike(Integer id, Long userId) {
-        isExistsId(id);
+        isExistsIdFilm(id);
         log.info("User userId={} liked the film id={}", userId, id);
         return filmStorage.putLike(id, userId);
     }
 
     @Override
     public Film deleteLike(Integer id, Long userId) {
-        isExistsId(id);
+        isExistsIdFilm(id);
         log.info("User id={} removed the like from the film id={}", userId, id);
         return filmStorage.deleteLike(id, userId);
     }
 
     @Override
     public String deleteFilm(Integer id) {
-        isExistsId(id);
+        isExistsIdFilm(id);
         filmStorage.deleteFilm(id);
         log.info("Film with id={} deleted", id);
         return String.format("Film with id=%d deleted", id);

@@ -36,15 +36,23 @@ public class UserServiceDbImpl implements UserServiceDb {
 
     @Override
     public Collection<User> getFriends(Long id) {
-        getUserById(id);
+        isExistsIdUser(id);
         log.info("Received a list of friends for user id={}", id);
         return userStorage.getFriends(id);
     }
 
+    private void isExistsIdUser(Long userId) {
+        boolean isExists = userStorage.isExistsIdUser(userId);
+        if (!isExists) {
+            log.warn("User with id={} not found", userId);
+            throw new UserNotFoundException(String.format("User with id=%d not found", userId));
+        }
+    }
+
     @Override
     public Collection<User> getMutualFriends(Long id, Long otherId) {
-        getUserById(id);
-        getUserById(otherId);
+        isExistsIdUser(id);
+        isExistsIdUser(otherId);
         log.info("Received a list of mutual friends of user id={} and user otherId={}", id, otherId);
         return userStorage.getMutualFriends(id, otherId);
     }
@@ -70,8 +78,8 @@ public class UserServiceDbImpl implements UserServiceDb {
 
     @Override
     public String addFriendRequest(Long id, Long friendId) {
-        getUserById(id);
-        getUserById(friendId);
+        isExistsIdUser(id);
+        isExistsIdUser(friendId);
         userStorage.addFriendRequest(id, friendId);
         log.info("Added a friend request to user id={} from user id={} with status={}", friendId, id, false);
         return String.format(
@@ -80,25 +88,24 @@ public class UserServiceDbImpl implements UserServiceDb {
 
     @Override
     public User updateUser(User user) {
-        getUserById(user.getId());
+        isExistsIdUser(user.getId());
         log.info("Update user {}", user);
         return userStorage.updateUser(user);
     }
 
     @Override
-    public String addInFriend(Long id, Long friendId) {
-        getUserById(id);
-        getUserById(friendId);
-        userStorage.addInFriend(id, friendId);
+    public User addInFriend(Long id, Long friendId) {
+        isExistsIdUser(id);
+        isExistsIdUser(friendId);
+        User user = userStorage.addInFriend(id, friendId);
         log.info("User id={} has been added as a friend to user id={} with status={}", friendId, id, true);
-        return String.format(
-                "User id=%d has been added as a friend to user id=%d with status=true", friendId, id);
+        return user;
     }
 
     @Override
     public String deleteForFriends(Long id, Long friendId) {
-        getUserById(id);
-        getUserById(friendId);
+        isExistsIdUser(id);
+        isExistsIdUser(friendId);
         userStorage.deleteForFriends(id, friendId);
         log.info("User id={} has been removed from friends of user id={}", friendId, id);
         return String.format("User id=%d has been removed from friends of user id=%d", friendId, id);
@@ -106,7 +113,7 @@ public class UserServiceDbImpl implements UserServiceDb {
 
     @Override
     public String deleteUser(Long id) {
-        getUserById(id);
+        isExistsIdUser(id);
         userStorage.deleteUser(id);
         log.info("User with id={} deleted", id);
         return String.format("User with id=%d deleted", id);

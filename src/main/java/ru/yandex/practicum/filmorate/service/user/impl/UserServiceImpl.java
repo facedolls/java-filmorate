@@ -85,15 +85,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addInFriend(Long id, Long friendId) {
+    public User addInFriend(Long id, Long friendId) {
         User userFirst = getUserById(id);
         User userSecond = getUserById(friendId);
         userFirst.getFriends().add(friendId);
         userSecond.getFriends().add(id);
-        userStorage.updateUser(userFirst);
+        User user = userStorage.updateUser(userFirst);
         userStorage.updateUser(userSecond);
         log.info("User id={} and user id={} are added as friends to each other", id, friendId);
-        return String.format("User id=%d and user friendId=%d are added as friends to each other", id, friendId);
+        return user;
     }
 
     @Override

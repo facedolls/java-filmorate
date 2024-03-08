@@ -7,19 +7,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class FilmMapper implements ResultSetExtractor<Collection<Film>> {
-    private final Map<Integer, Film> films = new LinkedHashMap<>();
+public class FilmMapper implements ResultSetExtractor<List<Film>> {
+    private final List<Film> films = new ArrayList<>();
+    private Film film = new Film();
     private List<Genre> genres = new ArrayList<>();
     private Set<Long> likes = new HashSet<>();
-    private Film film = new Film();
 
     @Override
-    public Collection<Film> extractData(ResultSet rs) throws SQLException, DataAccessException {
+    public List<Film> extractData(ResultSet rs) throws SQLException, DataAccessException {
         while (rs.next()) {
             if (isFullFilm(rs)) {
                 film.setLike(likes);
                 film.setGenres(genres);
-                films.put(film.getId(), film);
+                films.add(film);
                 prepareForNewFilm();
             }
 
@@ -42,10 +42,10 @@ public class FilmMapper implements ResultSetExtractor<Collection<Film>> {
         if (isLastFilm(film)) {
             film.setLike(likes);
             film.setGenres(genres);
-            films.put(film.getId(), film);
+            films.add(film);
         }
 
-        return films.values();
+        return films;
     }
 
     private boolean isGenreOfThisFilm(ResultSet rs, List<Genre> genres) throws SQLException {

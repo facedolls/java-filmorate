@@ -8,5 +8,5 @@ public interface FilmStorageDb extends FilmStorage {
 
     Film deleteLike(Integer id, Long userId);
 
-    boolean isExistsId(Integer filmId);
+    boolean isExistsIdFilm(Integer filmId);
 }
