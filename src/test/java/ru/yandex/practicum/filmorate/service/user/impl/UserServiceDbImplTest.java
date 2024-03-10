@@ -27,7 +27,7 @@ public class UserServiceDbImplTest {
 
     @DisplayName("Не должен найти пользователя по id, которого нет")
     @Test
-    public void ShouldNotFindUserId() {
+    public void shouldNotFindUserId() {
         UserNotFoundException exception = assertThrows(
                 UserNotFoundException.class,
                 () -> userService.getUserById(55L)
@@ -37,7 +37,7 @@ public class UserServiceDbImplTest {
 
     @DisplayName("Не должен создать пользователя, если id > 0")
     @Test
-    public void ShouldNotCreateUser() {
+    public void shouldNotCreateUser() {
         UserAlreadyExistException exception = assertThrows(
                 UserAlreadyExistException.class,
                 () -> userService.createUser(user1)
@@ -48,7 +48,7 @@ public class UserServiceDbImplTest {
 
     @DisplayName("Не должен обновить пользователя с несуществующим id")
     @Test
-    public void ShouldNotUpdateUser() {
+    public void shouldNotUpdateUser() {
         User user = new User(55,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
         UserNotFoundException exception = assertThrows(
@@ -60,7 +60,7 @@ public class UserServiceDbImplTest {
 
     @DisplayName("Не должен удалить пользователя с несуществующим id")
     @Test
-    public void ShouldNotDeleteUser() {
+    public void shouldNotDeleteUser() {
         UserNotFoundException exception = assertThrows(
                 UserNotFoundException.class,
                 () -> userService.deleteUser(55L)
