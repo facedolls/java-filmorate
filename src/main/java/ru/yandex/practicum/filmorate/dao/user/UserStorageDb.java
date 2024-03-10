@@ -9,11 +9,13 @@ public interface UserStorageDb extends UserStorage {
 
     Collection<User> getMutualFriends(Long id, Long otherId);
 
-    void addFriendRequest(Long id, Long friendId);
+    boolean addFriendRequest(Long id, Long friendId);
 
     User addInFriend(Long id, Long friendId);
 
-    void deleteForFriends(Long id, Long friendId);
+    void deleteFromFriends(Long id, Long friendId);
 
     boolean isExistsIdUser(Long userId);
+
+    boolean isExistsFriendship(Long id, Long friendId);
 }

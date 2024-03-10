@@ -75,13 +75,23 @@ public class UserStorageDbImpl implements UserStorageDb {
     }
 
     @Override
-    public void addFriendRequest(Long id, Long friendId) {
-        String sqlQuery = "INSERT INTO friendship VALUES (:userId, :friendId, false)";
-        parameter.update(sqlQuery, Map.of("userId", id, "friendId", friendId));
+    public boolean addFriendRequest(Long id, Long friendId) {
+        String sqlQueryFirst = "INSERT INTO friendship VALUES (:userId, :friendId, false)";
+        parameter.update(sqlQueryFirst, Map.of("userId", id, "friendId", friendId));
+
+        String sqlQuerySecond = "SELECT friend_id FROM friendship " +
+                "WHERE user_id = :userId AND friend_id = :friendId AND status = false";
+        List<Object> addedFriendId = parameter.query(sqlQuerySecond, Map.of("userId", id, "friendId", friendId),
+                (rs, rowNum) -> rs.getInt("friend_id"));
+
+        return addedFriendId.size() == 1;
     }
 
     @Override
     public User addInFriend(Long id, Long friendId) {
+        String deleteFriendRequest = "DELETE FROM friendship WHERE user_id = :userId AND friend_id = :friendId";
+        parameter.update(deleteFriendRequest, Map.of("userId", id, "friendId", friendId));
+
         String sqlQuery = "INSERT INTO friendship VALUES (:userId, :friendId, true)";
         parameter.update(sqlQuery, Map.of("userId", id, "friendId", friendId));
         return getUserById(id);
@@ -104,7 +114,7 @@ public class UserStorageDbImpl implements UserStorageDb {
     }
 
     @Override
-    public void deleteForFriends(Long id, Long friendId) {
+    public void deleteFromFriends(Long id, Long friendId) {
         String sqlQuery = "DELETE FROM friendship WHERE user_id = :userId AND friend_id = :friendId";
         parameter.update(sqlQuery, Map.of("userId", id, "friendId", friendId));
     }
@@ -113,6 +123,15 @@ public class UserStorageDbImpl implements UserStorageDb {
     public boolean isExistsIdUser(Long userId) {
         String sqlQuery = "SELECT user_id FROM users WHERE user_id = :userId";
         List<Object> id = parameter.query(sqlQuery, Map.of("userId", userId),
+                (rs, rowNum) -> rs.getInt("user_id"));
+        return id.size() == 1;
+    }
+
+    @Override
+    public boolean isExistsFriendship(Long userId, Long friendId) {
+        String sqlQuery = "SELECT user_id FROM friendship " +
+                "WHERE user_id = :userId AND friend_id = :friendId AND status = true";
+        List<Object> id = parameter.query(sqlQuery, Map.of("userId", userId, "friendId", friendId),
                 (rs, rowNum) -> rs.getInt("user_id"));
         return id.size() == 1;
     }

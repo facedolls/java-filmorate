@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String deleteForFriends(Long id, Long friendId) {
+    public String deleteFromFriends(Long id, Long friendId) {
         User userFirst = getUserById(id);
         User userSecond = getUserById(friendId);
         userFirst.getFriends().remove(friendId);

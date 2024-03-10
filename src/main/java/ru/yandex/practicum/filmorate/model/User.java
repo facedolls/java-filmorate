@@ -9,6 +9,7 @@ import java.util.*;
 
 @Data
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class User {
     private long id;
     @NotBlank

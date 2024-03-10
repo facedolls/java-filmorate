@@ -74,7 +74,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public String deleteForFriends(@PathVariable @NotNull @Min(1) Long id,
                                    @PathVariable @NotNull @Min(1) Long friendId) {
-        return userService.deleteForFriends(id, friendId);
+        return userService.deleteFromFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}")

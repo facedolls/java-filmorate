@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dao.user.UserStorageDb;
 import ru.yandex.practicum.filmorate.service.user.UserServiceDb;
@@ -80,7 +79,14 @@ public class UserServiceDbImpl implements UserServiceDb {
     public String addFriendRequest(Long id, Long friendId) {
         isExistsIdUser(id);
         isExistsIdUser(friendId);
-        userStorage.addFriendRequest(id, friendId);
+        boolean isAddFriendRequest = userStorage.addFriendRequest(id, friendId);
+
+        if (!isAddFriendRequest) {
+            log.info("Not added friend request to user id={} from user id={}", friendId, id);
+            return String.format(
+                    "Not added friend request to user id=%d from user id=%d", friendId, id);
+        }
+
         log.info("Added a friend request to user id={} from user id={} with status={}", friendId, id, false);
         return String.format(
                 "Added a friend request to user id=%d from user id=%d with status=false", friendId, id);
@@ -103,10 +109,15 @@ public class UserServiceDbImpl implements UserServiceDb {
     }
 
     @Override
-    public String deleteForFriends(Long id, Long friendId) {
+    public String deleteFromFriends(Long id, Long friendId) {
         isExistsIdUser(id);
         isExistsIdUser(friendId);
-        userStorage.deleteForFriends(id, friendId);
+        boolean isExistsFriendship = userStorage.isExistsFriendship(id, friendId);
+        if (!isExistsFriendship) {
+            log.info("Friendship user id={} with user id={} not found", friendId, id);
+            return String.format("Friendship user id=%d with user id=%d not found", friendId, id);
+        }
+        userStorage.deleteFromFriends(id, friendId);
         log.info("User id={} has been removed from friends of user id={}", friendId, id);
         return String.format("User id=%d has been removed from friends of user id=%d", friendId, id);
     }
