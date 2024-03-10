@@ -72,13 +72,13 @@ public class FilmServiceDbImplTest {
     @DisplayName("Не должен обновить фильм и должен выдать исключение FilmNotFoundException")
     @Test
     public void shouldNotUpdateFilmDueToNonExistentId() {
-        Film film_1 = new Film(60,"60", "60",
+        Film film = new Film(60,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
 
         FilmNotFoundException exception = assertThrows(
                 FilmNotFoundException.class,
-                () -> filmService.updateFilm(film_1)
+                () -> filmService.updateFilm(film)
         );
         assertEquals("Film with id=60 not found", exception.getMessage());
     }
@@ -87,13 +87,13 @@ public class FilmServiceDbImplTest {
     @Test
     public void shouldNotUpdateFilmDueToNonExistentRatingMpa() {
         filmService.createFilm(film2);
-        Film film_1 = new Film(1,"60", "60",
+        Film film = new Film(1,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1000, "GKLJH"), List.of(new Genre(1, "Комедия")));
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> filmService.updateFilm(film_1)
+                () -> filmService.updateFilm(film)
         );
         assertEquals("Rating MPA with id=1000 not already exist", exception.getMessage());
     }

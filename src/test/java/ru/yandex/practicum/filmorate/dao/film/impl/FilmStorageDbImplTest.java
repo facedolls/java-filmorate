@@ -165,11 +165,11 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен вернуть все фильмы")
     @Test
     public void shouldReturnAllFilms() {
-        Film film_1 = filmStorage.createFilm(film1);
-        Film film_2 = filmStorage.createFilm(film2);
-        Film film_3 = filmStorage.createFilm(film3);
-        Film film_4 = filmStorage.createFilm(film4);
-        List<Film> films = List.of(film_1, film_2, film_3, film_4);
+        Film filmNew1 = filmStorage.createFilm(film1);
+        Film filmNew2 = filmStorage.createFilm(film2);
+        Film filmNew3 = filmStorage.createFilm(film3);
+        Film filmNew4 = filmStorage.createFilm(film4);
+        List<Film> films = List.of(filmNew1, filmNew2, filmNew3, filmNew4);
 
         Collection<Film> result = filmStorage.getAllFilms();
         assertThat(result)
@@ -181,13 +181,13 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен вернуть 2 популярных фильма")
     @Test
     void shouldReturnPopularFilms() {
-        Film filmResult_1 = new Film(1, "8 миля", "Джимми Смит",
+        Film filmResult1 = new Film(1, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), Set.of(1L, 3L), List.of(new Genre(1, "Комедия")));
-        Film filmResult_3 = new Film(3, "Веселые ребята", "Трое друзей отправляются в путешествие",
+        Film filmResult3 = new Film(3, "Веселые ребята", "Трое друзей отправляются в путешествие",
                 LocalDate.of(2013, 4, 26), 80,
                 new RatingMpa(3, "PG-13"), Set.of(1L, 2L, 3L), List.of(new Genre(1, "Комедия")));
-        List<Film> films = List.of(filmResult_3, filmResult_1);
+        List<Film> films = List.of(filmResult3, filmResult1);
 
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
@@ -274,7 +274,7 @@ public class FilmStorageDbImplTest {
                 .isNotNull()
                 .isEqualTo(true);
 
-        boolean resultSecond= filmStorage.isExistsIdFilm(358);
+        boolean resultSecond = filmStorage.isExistsIdFilm(358);
         assertThat(resultSecond)
                 .isNotNull()
                 .isEqualTo(false);

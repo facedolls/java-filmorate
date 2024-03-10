@@ -38,7 +38,7 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен создать пользователя")
     @Test
     public void shouldCreateUser() {
-        User user_1 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
+        User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1), new HashSet<>());
         userStorage.createUser(user1);
 
@@ -46,7 +46,7 @@ public class UserStorageDbImplTest {
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
-                .isEqualTo(user_1);
+                .isEqualTo(user3);
     }
 
     @DisplayName("Должен обновить пользователя")
@@ -67,7 +67,7 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен вернуть пользователя по id")
     @Test
     public void shouldReturnUserById() {
-        User user_1 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
+        User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1), new HashSet<>());
         userStorage.createUser(user1);
 
@@ -75,7 +75,7 @@ public class UserStorageDbImplTest {
         assertThat(result1)
                 .isNotNull()
                 .usingRecursiveComparison()
-                .isEqualTo(user_1);
+                .isEqualTo(user3);
 
         User result2 = userStorage.getUserById(57L);
         assertThat(result2)
@@ -89,10 +89,10 @@ public class UserStorageDbImplTest {
         assertThat(result1)
                 .isEmpty();
 
-        User user_1 = userStorage.createUser(user1);
-        User user_2 = userStorage.createUser(user2);
-        User user_3 = userStorage.createUser(user3);
-        List<User> users = List.of(user_1, user_2, user_3);
+        User userNew1 = userStorage.createUser(user1);
+        User userNew2 = userStorage.createUser(user2);
+        User userNew3 = userStorage.createUser(user3);
+        List<User> users = List.of(userNew1, userNew2, userNew3);
 
         Collection<User> result2 = userStorage.getAllUsers();
         assertThat(result2)
@@ -106,9 +106,9 @@ public class UserStorageDbImplTest {
     public void shouldReturnAllFriendsUser() {
         userStorage.createUser(user1);
         userStorage.createUser(user2);
-        User user_3 = userStorage.createUser(user3);
+        User userNew3 = userStorage.createUser(user3);
 
-        List<User> users = List.of(user_3);
+        List<User> users = List.of(userNew3);
         userStorage.addInFriend(1L, 3L);
 
         Collection<User> result = userStorage.getFriends(1L);
@@ -122,9 +122,9 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldReturnUsersMutualFriends() {
         userStorage.createUser(user1);
-        User user_2 = userStorage.createUser(user2);
+        User userNew2 = userStorage.createUser(user2);
         userStorage.createUser(user3);
-        List<User> users = List.of(user_2);
+        List<User> users = List.of(userNew2);
 
         userStorage.addInFriend(1L, 2L);
         userStorage.addInFriend(3L, 2L);
