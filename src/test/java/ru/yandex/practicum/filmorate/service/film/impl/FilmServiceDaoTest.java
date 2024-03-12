@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import ru.yandex.practicum.filmorate.dao.film.impl.FilmStorageDao;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
@@ -16,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmServiceDaoTest {
     private FilmService filmService;
-    private final FilmStorage filmStorage;
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcOperations parameter;
+    private final FilmStorage filmStorage = new FilmStorageDao(jdbcTemplate, parameter);
     private Film film1;
     private Film film2;
 
