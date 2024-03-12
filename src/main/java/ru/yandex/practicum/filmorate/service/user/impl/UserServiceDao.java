@@ -6,16 +6,16 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dao.user.UserStorageDb;
-import ru.yandex.practicum.filmorate.service.user.UserServiceDb;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Primary
-public class UserServiceDbImpl implements UserServiceDb {
-    private final UserStorageDb userStorage;
+public class UserServiceDao implements UserService {
+    private final UserStorage userStorage;
 
     @Override
     public User getUserById(Long id) {
@@ -59,10 +59,6 @@ public class UserServiceDbImpl implements UserServiceDb {
     @Override
     public User createUser(User user) {
         setUserNameIfMissing(user);
-        if (user.getId() != 0) {
-            log.warn("User already exists {}", user);
-            throw new UserAlreadyExistException("User already exists: " + user);
-        }
         User userCreated = userStorage.createUser(user);
         log.info("Create user {}", userCreated);
         return userCreated;
@@ -73,23 +69,6 @@ public class UserServiceDbImpl implements UserServiceDb {
             log.info("The user's empty name {} has been changed to {}", user, user.getLogin());
             user.setName(user.getLogin());
         }
-    }
-
-    @Override
-    public String addFriendRequest(Long id, Long friendId) {
-        isExistsIdUser(id);
-        isExistsIdUser(friendId);
-        boolean isAddFriendRequest = userStorage.addFriendRequest(id, friendId);
-
-        if (!isAddFriendRequest) {
-            log.info("Not added friend request to user id={} from user id={}", friendId, id);
-            return String.format(
-                    "Not added friend request to user id=%d from user id=%d", friendId, id);
-        }
-
-        log.info("Added a friend request to user id={} from user id={} with status={}", friendId, id, false);
-        return String.format(
-                "Added a friend request to user id=%d from user id=%d with status=false", friendId, id);
     }
 
     @Override

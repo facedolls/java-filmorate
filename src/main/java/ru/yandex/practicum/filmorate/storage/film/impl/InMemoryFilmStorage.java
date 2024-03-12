@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
-    private final List<Genre> genres = List.of(new Genre(1, "Комедия"), new Genre(2, "Драма"),
-            new Genre(3, "Мультфильм"), new Genre(4, "Триллер"),
-            new Genre(5, "Документальный"), new Genre(6, "Боевик"));
-    private final List<RatingMpa> ratingMpa = List.of(new RatingMpa(1, "G"), new RatingMpa(2, "PG"),
-            new RatingMpa(3, "PG-13"), new RatingMpa(4, "R"), new RatingMpa(5, "NC-17"));
+    private final Map<Integer, Genre> genres = Map.of(
+            1, new Genre(1, "Комедия"), 2, new Genre(2, "Драма"),
+            3, new Genre(3, "Мультфильм"), 4, new Genre(4, "Триллер"),
+            5, new Genre(5, "Документальный"), 6, new Genre(6, "Боевик"));
+    private final Map<Integer, RatingMpa> ratingMpa = Map.of(1, new RatingMpa(1, "G"),
+            2, new RatingMpa(2, "PG"), 3, new RatingMpa(3, "PG-13"),
+            4, new RatingMpa(4, "R"), 5, new RatingMpa(5, "NC-17"));
     private static int id = 1;
 
     @Override
@@ -36,22 +38,32 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Genre> getAllGenres() {
-        return genres;
+        return genres.values().stream()
+                .sorted(Comparator.comparing(Genre::getId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Genre getGenreById(Integer id) {
-        return genres.get(id - 1);
+        if (genres.containsKey(id)) {
+            return genres.get(id);
+        }
+        return null;
     }
 
     @Override
     public Collection<RatingMpa> getAllMpa() {
-        return ratingMpa;
+        return ratingMpa.values().stream()
+                .sorted(Comparator.comparing(RatingMpa::getId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public RatingMpa getMpaById(Integer id) {
-        return ratingMpa.get(id - 1);
+        if (ratingMpa.containsKey(id)) {
+            return ratingMpa.get(id);
+        }
+        return null;
     }
 
     @Override
@@ -70,5 +82,34 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteFilm(Integer id) {
         films.remove(id);
+    }
+
+    @Override
+    public Film putLike(Integer id, Long userId) {
+        if (films.containsKey(id)) {
+            Film film = films.get(id);
+            Set<Long> like = film.getLike();
+            like.add(userId);
+            films.put(id, film);
+            return film;
+        }
+        return null;
+    }
+
+    @Override
+    public Film deleteLike(Integer id, Long userId) {
+        if (films.containsKey(id)) {
+            Film film = films.get(id);
+            Set<Long> like = film.getLike();
+            like.remove(userId);
+            films.put(id, film);
+            return film;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isExistsIdFilm(Integer filmId) {
+        return films.containsKey(filmId);
     }
 }

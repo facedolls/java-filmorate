@@ -47,7 +47,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Genre getGenreById(Integer id) {
-        return filmStorage.getGenreById(id);
+        Genre genre = filmStorage.getGenreById(id);
+        if (genre == null) {
+            log.warn("Genre with id={} not found", id);
+            throw new NotFoundException(String.format("Genre with id=%d not found", id));
+        }
+        return genre;
     }
 
     @Override
@@ -57,19 +62,27 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public RatingMpa getMpaById(Integer id) {
-        return filmStorage.getMpaById(id);
+        RatingMpa mpa = filmStorage.getMpaById(id);
+        if (mpa == null) {
+            log.warn("Rating MPA with id={} not found", id);
+            throw new NotFoundException(String.format("Rating MPA with id=%d not found", id));
+        }
+        return mpa;
     }
 
     @Override
     public Film createFilm(Film film) {
-        if (film.getId() != 0) {
-            log.warn("Film already exist {}", film);
-            throw new FilmAlreadyExistException(String.format(
-                    "Film id=%d \"%s\"already exist", film.getId(),film.getName()));
+        if (!isExistsRatingMpa(film.getMpa().getId())) {
+            throw new ValidationException(String.format(
+                    "Incorrect id=%d was passed when creating the film", film.getMpa().getId()));
         }
         Film createdFilm = filmStorage.createFilm(film);
         log.info("Create film {}", film);
         return createdFilm;
+    }
+
+    private boolean isExistsRatingMpa(Integer id) {
+        return filmStorage.getMpaById(id) != null;
     }
 
     @Override

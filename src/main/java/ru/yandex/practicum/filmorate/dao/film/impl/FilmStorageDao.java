@@ -6,73 +6,75 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.film.FilmStorageDb;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
 @Primary
-public class FilmStorageDbImpl implements FilmStorageDb {
+public class FilmStorageDao implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
 
     @Override
     public Film getFilmsById(Integer id) {
-        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, " +
-                "f.rating_id, r.name AS rating_name, l.user_id, fg.genre_id, g.name AS genre_name " +
+        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, " +
+                "r.name AS rating_name, ARRAY_AGG(DISTINCT l.user_id::VARCHAR) AS likes, " +
+                "ARRAY_AGG(DISTINCT fg.genre_id::VARCHAR || ',' || g.name) AS genres " +
                 "FROM film AS f " +
                 "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
                 "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
                 "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
                 "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
-                "WHERE f.film_id = :filmId";
+                "WHERE f.film_id = :filmId " +
+                "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, rating_name ";
         return parameter.query(sqlQuery, Map.of("filmId", id), new FilmMapper()).stream()
                 .findAny().orElse(null);
     }
 
     @Override
     public Collection<Film> getAllFilms() {
-        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, " +
-                "f.rating_id, r.name AS rating_name, l.user_id, fg.genre_id, g.name AS genre_name " +
+        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, " +
+                "r.name AS rating_name, ARRAY_AGG(DISTINCT l.user_id::VARCHAR) AS likes, " +
+                "ARRAY_AGG(DISTINCT fg.genre_id::VARCHAR || ',' || g.name) AS genres " +
                 "FROM film AS f " +
                 "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
                 "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
                 "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
                 "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
-                "ORDER BY f.film_id";
+                "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, rating_name";
         return parameter.query(sqlQuery, new FilmMapper());
     }
 
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
-       String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, " +
-               "f.rating_id, r.name AS rating_name, l.user_id, fg.genre_id, g.name AS genre_name " +
-               "FROM film AS f " +
-               "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
-               "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
-               "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
-               "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
-               "WHERE f.film_id IN (" +
-               "SELECT fm.film_id FROM film AS fm " +
-               "left JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
-               "GROUP BY fm.film_id " +
-               "ORDER BY COUNT(fm.film_id) DESC " +
-               "LIMIT :count)";
-        return parameter.query(sqlQuery, Map.of("count", count), new FilmMapper()).stream()
-                .sorted((film1, film2) -> film2.getLike().size() - film1.getLike().size())
-                .collect(Collectors.toList());
+        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, " +
+                "r.name AS rating_name, ARRAY_AGG(DISTINCT l.user_id::VARCHAR) AS likes, " +
+                "COUNT(DISTINCT l.user_id) AS count_likes, " +
+                "ARRAY_AGG(distinct fg.genre_id::VARCHAR || ',' || g.name) AS genres " +
+                "FROM film AS f " +
+                "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
+                "WHERE f.film_id IN (" +
+                "SELECT fm.film_id FROM film AS fm " +
+                "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+                "GROUP BY fm.film_id " +
+                "ORDER BY COUNT(fm.film_id) DESC " +
+                "LIMIT :count) " +
+                "GROUP by f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, rating_name " +
+                "ORDER BY count_likes DESC";
+        return parameter.query(sqlQuery, Map.of("count", count), new FilmMapper());
     }
 
     @Override
     public Collection<Genre> getAllGenres() {
-        String sqlQuery = "SELECT * FROM genre";
+        String sqlQuery = "SELECT * FROM genre ORDER BY genre_id";
         return parameter.query(sqlQuery,
-                (rs, rowNum) -> new Genre(rs.getInt("genre_id"), rs.getString("name")))
-                .stream().sorted(Comparator.comparingInt(Genre::getId))
-                .collect(Collectors.toList());
+                (rs, rowNum) -> new Genre(rs.getInt("genre_id"), rs.getString("name")));
     }
 
     @Override
@@ -85,11 +87,9 @@ public class FilmStorageDbImpl implements FilmStorageDb {
 
     @Override
     public Collection<RatingMpa> getAllMpa() {
-        String sqlQuery = "SELECT * FROM rating";
+        String sqlQuery = "SELECT * FROM rating ORDER BY rating_id";
         return parameter.query(sqlQuery,
-                (rs, rowNum) -> new RatingMpa(rs.getInt("rating_id"), rs.getString("name")))
-                .stream().sorted(Comparator.comparingInt(RatingMpa::getId))
-                .collect(Collectors.toList());
+                (rs, rowNum) -> new RatingMpa(rs.getInt("rating_id"), rs.getString("name")));
     }
 
     @Override
@@ -161,8 +161,7 @@ public class FilmStorageDbImpl implements FilmStorageDb {
     public boolean isExistsIdFilm(Integer filmId) {
         String sqlQuery = "SELECT film_id FROM film WHERE film_id = :filmId";
         List<Object> id = parameter.query(sqlQuery,
-                Map.of("filmId", filmId),
-                (rs, rowNum) -> rs.getInt("film_id"));
+                Map.of("filmId", filmId), (rs, rowNum) -> rs.getInt("film_id"));
         return id.size() == 1;
     }
 }

@@ -8,8 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,31 +36,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<User> getFriends(Long id) {
-        Set<Long> idFriends = getUserById(id).getFriends();
+        getUserById(id);
         log.info("Received a list of friends for user id={}", id);
-        return idFriends.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(id);
     }
 
     @Override
     public Collection<User> getMutualFriends(Long id, Long otherId) {
-        Set<Long> idCommonFriends = getUserById(id).getFriends().stream()
-                .filter(getUserById(otherId).getFriends()::contains)
-                .collect(Collectors.toSet());
+        getUserById(id);
+        getUserById(otherId);
         log.info("Received a list of mutual friends of user id={} and user otherId={}", id, otherId);
-        return idCommonFriends.stream()
-                .map(this::getUserById)
-                .collect(Collectors.toList());
+        return userStorage.getMutualFriends(id, otherId);
     }
 
     @Override
     public User createUser(User user) {
         setUserNameIfMissing(user);
-        if (user.getId() != 0) {
-            log.warn("User already exists {}", user);
-            throw new UserAlreadyExistException("User already exists: " + user);
-        }
         User createdUser = userStorage.createUser(user);
         log.info("Create user {}", user);
         return createdUser;
@@ -77,8 +66,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(User user) {
-        setUserNameIfMissing(user);
         checkUserExistence(user.getId());
+        setUserNameIfMissing(user);
         User updatedUser = userStorage.updateUser(user);
         log.info("Update user {}", user);
         return updatedUser;
@@ -86,24 +75,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addInFriend(Long id, Long friendId) {
-        User userFirst = getUserById(id);
-        User userSecond = getUserById(friendId);
-        userFirst.getFriends().add(friendId);
-        userSecond.getFriends().add(id);
-        User user = userStorage.updateUser(userFirst);
-        userStorage.updateUser(userSecond);
+        checkUserExistence(id);
+        checkUserExistence(friendId);
         log.info("User id={} and user id={} are added as friends to each other", id, friendId);
-        return user;
+        return userStorage.addInFriend(id, friendId);
     }
 
     @Override
     public String deleteFromFriends(Long id, Long friendId) {
-        User userFirst = getUserById(id);
-        User userSecond = getUserById(friendId);
-        userFirst.getFriends().remove(friendId);
-        userSecond.getFriends().remove(id);
-        userStorage.updateUser(userFirst);
-        userStorage.updateUser(userSecond);
+        checkUserExistence(id);
+        checkUserExistence(friendId);
+        userStorage.isExistsFriendship(id, friendId);
+        userStorage.deleteFromFriends(id, friendId);
         log.info("User id={} and user id={} are deleted as friends to each other", id, friendId);
         return String.format("User id=%d and user friendId=%d are deleted as friends to each other", id, friendId);
     }

@@ -7,10 +7,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.dao.film.FilmStorageDb;
-import ru.yandex.practicum.filmorate.dao.user.UserStorageDb;
-import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDbImpl;
+import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDao;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,11 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class FilmStorageDbImplTest {
+public class FilmStorageDaoTest {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    private FilmStorageDb filmStorage;
-    private UserStorageDb userStorage;
+    private FilmStorage filmStorage;
+    private UserStorage userStorage;
     private Film film1;
     private Film film2;
     private Film film3;
@@ -33,8 +33,8 @@ public class FilmStorageDbImplTest {
 
     @BeforeEach
     public void setUp() {
-        filmStorage = new FilmStorageDbImpl(jdbcTemplate, parameter);
-        userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
+        filmStorage = new FilmStorageDao(jdbcTemplate, parameter);
+        userStorage = new UserStorageDao(jdbcTemplate, parameter);
         film1 = new Film("8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));

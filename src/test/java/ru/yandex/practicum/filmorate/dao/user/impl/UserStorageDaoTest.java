@@ -7,8 +7,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.dao.user.UserStorageDb;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,17 +16,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class UserStorageDbImplTest {
+public class UserStorageDaoTest {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    private UserStorageDb userStorage;
+    private UserStorage userStorage;
     private User user1;
     private User user2;
     private User user3;
 
     @BeforeEach
     public void setUp() {
-        userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
+        userStorage = new UserStorageDao(jdbcTemplate, parameter);
         user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
         user2 = new User("livanova@email.ru", "liv4mar123", "Мария Ливанова",
@@ -134,18 +134,6 @@ public class UserStorageDbImplTest {
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(users);
-    }
-
-    @DisplayName("Должен добавить пользователю с id = 1 заявку в друзья от пользователя с id = 2")
-    @Test
-    public void shouldAddUserFriendRequest() {
-        userStorage.createUser(user1);
-        userStorage.createUser(user2);
-        boolean result = userStorage.addFriendRequest(1L, 2L);
-
-        assertThat(result)
-                .isNotNull()
-                .isEqualTo(true);
     }
 
     @DisplayName("Должен добавить пользователя с id = 2 в друзья пользователю с id = 1")

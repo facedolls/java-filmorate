@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.dao.film.FilmStorageDb;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Primary
-public class FilmServiceDbImpl implements FilmService {
-    private final FilmStorageDb filmStorage;
+public class FilmServiceDao implements FilmService {
+    private final FilmStorage filmStorage;
 
     @Override
     public Film getFilmById(Integer id) {
@@ -74,13 +74,6 @@ public class FilmServiceDbImpl implements FilmService {
     @Override
     public Film createFilm(Film film) {
         isExistsRatingMpa(film);
-
-        if (film.getId() != 0) {
-            log.warn("Film already exist {}", film);
-            throw new FilmAlreadyExistException(String.format(
-                    "Film id=%d \"%s\"already exist", film.getId(),film.getName()));
-        }
-
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;

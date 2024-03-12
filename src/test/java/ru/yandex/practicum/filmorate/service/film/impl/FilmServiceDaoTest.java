@@ -4,25 +4,25 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.dao.film.FilmStorageDb;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class FilmServiceDbImplTest {
+public class FilmServiceDaoTest {
     private FilmService filmService;
-    private final FilmStorageDb filmStorage;
+    private final FilmStorage filmStorage;
     private Film film1;
     private Film film2;
 
     @BeforeEach
     public void setUp() {
-        filmService = new FilmServiceDbImpl(filmStorage);
+        filmService = new FilmServiceDao(filmStorage);
         film1 = new Film(1,"1", "1", LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
         film2 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
@@ -57,16 +57,6 @@ public class FilmServiceDbImplTest {
                 () -> filmService.getMpaById(25)
         );
         assertEquals("Rating MPA with id=25 not found", exception.getMessage());
-    }
-
-    @DisplayName("Не должен создать фильм и должен выдать исключение FilmAlreadyExistException")
-    @Test
-    public void shouldNotCreateFilm() {
-        FilmAlreadyExistException exception = assertThrows(
-                FilmAlreadyExistException.class,
-                () -> filmService.createFilm(film1)
-        );
-        assertEquals("Film id=1 \"1\"already exist", exception.getMessage());
     }
 
     @DisplayName("Не должен обновить фильм и должен выдать исключение FilmNotFoundException")

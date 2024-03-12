@@ -4,23 +4,23 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.dao.user.UserStorageDb;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserServiceDb;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class UserServiceDbImplTest {
-    private UserServiceDb userService;
-    private final UserStorageDb userStorageDb;
+public class UserServiceDaoTest {
+    private UserService userService;
+    private final UserStorage userStorageDao;
     private User user1;
 
     @BeforeEach
     public void setUp() {
-        userService = new UserServiceDbImpl(userStorageDb);
+        userService = new UserServiceDao(userStorageDao);
         user1 = new User(1,"petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
     }
@@ -33,17 +33,6 @@ public class UserServiceDbImplTest {
                 () -> userService.getUserById(55L)
         );
         assertEquals("User with id=55 not found", exception.getMessage());
-    }
-
-    @DisplayName("Не должен создать пользователя, если id > 0")
-    @Test
-    public void shouldNotCreateUser() {
-        UserAlreadyExistException exception = assertThrows(
-                UserAlreadyExistException.class,
-                () -> userService.createUser(user1)
-        );
-        assertEquals("User already exists: User(id=1, email=petrov@email.ru, login=vanya123, " +
-                "name=Иван Петров, birthday=1990-01-01, friends=[])", exception.getMessage());
     }
 
     @DisplayName("Не должен обновить пользователя с несуществующим id")
