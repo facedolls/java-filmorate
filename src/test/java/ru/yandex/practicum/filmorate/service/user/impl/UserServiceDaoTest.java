@@ -20,14 +20,12 @@ public class UserServiceDaoTest {
     private UserService userService;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    private final UserStorage userStorageDao = new UserStorageDao(jdbcTemplate, parameter);
-    private User user1;
+    private UserStorage userStorage;
 
     @BeforeEach
     public void setUp() {
-        userService = new UserServiceDao(userStorageDao);
-        user1 = new User(1,"petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1));
+        userStorage = new UserStorageDao(jdbcTemplate, parameter);
+        userService = new UserServiceDao(userStorage);
     }
 
     @DisplayName("Не должен найти пользователя по id, которого нет")

@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import ru.yandex.practicum.filmorate.dao.film.impl.FilmStorageDao;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
@@ -19,18 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmServiceDaoTest {
     private FilmService filmService;
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcOperations parameter;
-    private final FilmStorage filmStorage = new FilmStorageDao(jdbcTemplate, parameter);
+    private final FilmStorage filmStorage;
     private Film film1;
-    private Film film2;
 
     @BeforeEach
     public void setUp() {
         filmService = new FilmServiceDao(filmStorage);
-        film1 = new Film(1,"1", "1", LocalDate.of(2000, 12, 12), 60,
-                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
-        film2 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
+        film1 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
     }
 
@@ -81,7 +73,7 @@ public class FilmServiceDaoTest {
     @DisplayName("Не должен обновить фильм и должен выдать исключение ValidationException")
     @Test
     public void shouldNotUpdateFilmDueToNonExistentRatingMpa() {
-        filmService.createFilm(film2);
+        filmService.createFilm(film1);
         Film film = new Film(1,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1000, "GKLJH"), List.of(new Genre(1, "Комедия")));
