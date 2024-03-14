@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class UserStorageDaoTest {
+public class UserStorageDbImplTest {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     private UserStorage userStorage;
@@ -26,7 +26,7 @@ public class UserStorageDaoTest {
 
     @BeforeEach
     public void setUp() {
-        userStorage = new UserStorageDao(jdbcTemplate, parameter);
+        userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
         user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
         user2 = new User("livanova@email.ru", "liv4mar123", "Мария Ливанова",
@@ -39,7 +39,7 @@ public class UserStorageDaoTest {
     @Test
     public void shouldCreateUser() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), new HashSet<>());
+                LocalDate.of(1990, 1, 1), null);
         userStorage.createUser(user1);
 
         User result = userStorage.getUserById(1L);
@@ -53,7 +53,7 @@ public class UserStorageDaoTest {
     @Test
     public void shouldUpdateUser() {
         User userForUpdate = new User(1L, "petrovIvan@email.ru", "vanya789",
-                "Иван Петров Александрович", LocalDate.of(1991, 2, 2));
+                "Иван Петров Александрович", LocalDate.of(1991, 2, 2), null);
         userStorage.createUser(user1);
         userStorage.updateUser(userForUpdate);
 
@@ -68,7 +68,7 @@ public class UserStorageDaoTest {
     @Test
     public void shouldReturnUserById() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), new HashSet<>());
+                LocalDate.of(1990, 1, 1), null);
         userStorage.createUser(user1);
 
         User result1 = userStorage.getUserById(1L);
@@ -85,14 +85,20 @@ public class UserStorageDaoTest {
     @DisplayName("Должен вернуть всех пользователей")
     @Test
     public void shouldReturnAllUsers() {
+        List<User> users = List.of(new User(1,"petrov@email.ru", "vanya123", "Иван Петров",
+                        LocalDate.of(1990, 1, 1), new HashSet<>()),
+                new User(2,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+                        LocalDate.of(1994, 9, 17), new HashSet<>()),
+                new User(3,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+                        LocalDate.of(2000, 12, 24), new HashSet<>()));
+
         Collection<User> result1 = userStorage.getAllUsers();
         assertThat(result1)
                 .isEmpty();
 
-        User userNew1 = userStorage.createUser(user1);
-        User userNew2 = userStorage.createUser(user2);
-        User userNew3 = userStorage.createUser(user3);
-        List<User> users = List.of(userNew1, userNew2, userNew3);
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
 
         Collection<User> result2 = userStorage.getAllUsers();
         assertThat(result2)
@@ -104,11 +110,12 @@ public class UserStorageDaoTest {
     @DisplayName("Должен вернуть всех друзей пользователя с id = 1")
     @Test
     public void shouldReturnAllFriendsUser() {
+        List<User> users = List.of(new User(3,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+                LocalDate.of(2000, 12, 24), new HashSet<>()));
+
         userStorage.createUser(user1);
         userStorage.createUser(user2);
-        User userNew3 = userStorage.createUser(user3);
-
-        List<User> users = List.of(userNew3);
+        userStorage.createUser(user3);
         userStorage.addInFriend(1L, 3L);
 
         Collection<User> result = userStorage.getFriends(1L);
@@ -121,10 +128,12 @@ public class UserStorageDaoTest {
     @DisplayName("Должен вернуть общих друзей пользователя с id = 1 и пользователя с id = 3")
     @Test
     public void shouldReturnUsersMutualFriends() {
+        List<User> users = List.of(new User(2,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+                LocalDate.of(1994, 9, 17), new HashSet<>()));
+
         userStorage.createUser(user1);
-        User userNew2 = userStorage.createUser(user2);
+        userStorage.createUser(user2);
         userStorage.createUser(user3);
-        List<User> users = List.of(userNew2);
 
         userStorage.addInFriend(1L, 2L);
         userStorage.addInFriend(3L, 2L);

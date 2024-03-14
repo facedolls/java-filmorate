@@ -30,12 +30,13 @@ public class Film {
     private List<Genre> genres = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, int duration,
-                RatingMpa mpa, List<Genre> genres) {
+                RatingMpa mpa, Set<Long> like, List<Genre> genres) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+        this.like = like;
         this.genres = genres;
     }
 

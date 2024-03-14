@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDao;
+import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDbImpl;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class UserServiceDaoTest {
+public class UserServiceImplTest {
     private UserService userService;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
@@ -24,8 +24,8 @@ public class UserServiceDaoTest {
 
     @BeforeEach
     public void setUp() {
-        userStorage = new UserStorageDao(jdbcTemplate, parameter);
-        userService = new UserServiceDao(userStorage);
+        userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
+        userService = new UserServiceImpl(userStorage);
     }
 
     @DisplayName("Не должен найти пользователя по id, которого нет")

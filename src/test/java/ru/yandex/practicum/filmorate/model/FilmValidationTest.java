@@ -26,7 +26,7 @@ public class FilmValidationTest {
     public void shouldCreateFilm() throws Exception {
         Film film = new Film("8 Mile", "Jimmy Smith, nicknamed \"Rabbit\"",
                 LocalDate.of(2002, 11, 6), 110,
-                new RatingMpa(1, "G"),
+                new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
         mockMvc.perform(post("/films")
                         .content(objectMapper.writeValueAsString(film))
@@ -44,7 +44,7 @@ public class FilmValidationTest {
     @Test
     public void shouldReturnAnErrorCode400NameEmpty() throws Exception {
         Film film = new Film("", "future",
-                LocalDate.of(2000, 12, 12), 60, new RatingMpa(1, "G"),
+                LocalDate.of(2000, 12, 12), 60, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
@@ -57,7 +57,7 @@ public class FilmValidationTest {
     @Test
     public void shouldReturnAnErrorCode400NameBlank() throws Exception {
         Film film = new Film("        ", "present",
-                LocalDate.of(2000, 11, 11), 50, new RatingMpa(1, "G"),
+                LocalDate.of(2000, 11, 11), 50, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
@@ -74,7 +74,7 @@ public class FilmValidationTest {
                 "for the gossip on herself. But at the Olympics, Kady, whose opponent turns out to be an unattractive" +
                 " girl, realizes that even if she criticizes the girl's appearance, it will not save her from defeat." +
                 " Kady wins the tournament and returns to school.",
-                LocalDate.of(2004, 6, 10), 97, new RatingMpa(1, "G"),
+                LocalDate.of(2004, 6, 10), 97, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
@@ -88,7 +88,7 @@ public class FilmValidationTest {
     public void shouldReturnAnErrorCode400DescriptionEmpty() throws Exception {
         Film film = new Film("Spirited Away", "",
                 LocalDate.of(2002, 12, 31), 125, new RatingMpa(1, "G"),
-                List.of(new Genre(1, "Комедия")));
+                null, List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
                         .content(objectMapper.writeValueAsString(film))
@@ -100,7 +100,7 @@ public class FilmValidationTest {
     @Test
     public void shouldReturnAnErrorCode400DescriptionBlank() throws Exception {
         Film film = new Film("Back to the Future", "             ",
-                LocalDate.of(1985, 7, 3), 108, new RatingMpa(1, "G"),
+                LocalDate.of(1985, 7, 3), 108, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
@@ -113,7 +113,7 @@ public class FilmValidationTest {
     @Test
     public void shouldReturnAnErrorCode400DateBeforeMin() throws Exception {
         Film film = new Film("Date", "Date before min",
-                LocalDate.of(1880, 6, 6), 60, new RatingMpa(1, "G"),
+                LocalDate.of(1880, 6, 6), 60, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")
@@ -126,7 +126,7 @@ public class FilmValidationTest {
     @Test
     public void shouldReturnAnErrorCode400DurationNegative() throws Exception {
         Film film = new Film("Duration", "Duration negative",
-                LocalDate.of(2000, 7, 7), -100, new RatingMpa(1, "G"),
+                LocalDate.of(2000, 7, 7), -100, new RatingMpa(1, "G"), null,
                 List.of(new Genre(1, "Комедия")));
 
         mockMvc.perform(post("/films")

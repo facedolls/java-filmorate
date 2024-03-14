@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class FilmServiceDaoTest {
+public class FilmServiceImplTest {
     private FilmService filmService;
     private final FilmStorage filmStorage;
     private Film film1;
 
     @BeforeEach
     public void setUp() {
-        filmService = new FilmServiceDao(filmStorage);
+        filmService = new FilmServiceImpl(filmStorage);
         film1 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
-                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
+                new RatingMpa(1, "G"), null, List.of(new Genre(1, "Комедия")));
     }
 
     @DisplayName("Должен выдать исключение FilmNotFoundException и не найти id фильма")

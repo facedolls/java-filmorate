@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.film.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
@@ -12,20 +13,18 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Primary
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
 
     @Override
     public Film getFilmById(Integer id) {
-        checkFilmExistence(id);
-        return filmStorage.getFilmsById(id);
-    }
-
-    private void checkFilmExistence(Integer id) {
-        if (filmStorage.getFilmsById(id) == null) {
+        Film film = filmStorage.getFilmsById(id);
+        if (film == null) {
             log.warn("Film with id={} not found", id);
             throw new FilmNotFoundException(String.format("Film with id=%d not found", id));
         }
+        return film;
     }
 
     @Override
@@ -36,12 +35,13 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
-        log.info("Received popular films");
+        log.info("Received populars films");
         return filmStorage.getPopularFilm(count);
     }
 
     @Override
     public Collection<Genre> getAllGenres() {
+        log.info("Received all genres");
         return filmStorage.getAllGenres();
     }
 
@@ -57,6 +57,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Collection<RatingMpa> getAllMpa() {
+        log.info("Received all ratings mpa");
         return filmStorage.getAllMpa();
     }
 
@@ -72,50 +73,57 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
-        if (!isExistsRatingMpa(film.getMpa().getId())) {
-            throw new ValidationException(String.format(
-                    "Incorrect id=%d was passed when creating the film", film.getMpa().getId()));
-        }
-        Film createdFilm = filmStorage.createFilm(film);
-        log.info("Create film {}", film);
-        return createdFilm;
+        isExistsRatingMpa(film);
+        Film filmCreated = filmStorage.createFilm(film);
+        log.info("Create film {}", filmCreated);
+        return filmCreated;
     }
 
-    private boolean isExistsRatingMpa(Integer id) {
-        return filmStorage.getMpaById(id) != null;
+    private void isExistsRatingMpa(Film film) {
+        RatingMpa mpa = filmStorage.getMpaById(film.getMpa().getId());
+        if (mpa == null) {
+            log.warn("Rating MPA with id={} not already exist", film.getMpa().getId());
+            throw new ValidationException(String.format(
+                    "Rating MPA with id=%d not already exist", film.getMpa().getId()));
+        }
     }
 
     @Override
     public Film updateFilm(Film film) {
-        checkFilmExistence(film.getId());
-        Film updatedFilm = filmStorage.updateFilm(film);
-        log.info("Update film {}", film);
-        return updatedFilm;
+        isExistsIdFilm(film.getId());
+        isExistsRatingMpa(film);
+        Film filmUpdated = filmStorage.updateFilm(film);
+        log.info("Update film {}", filmUpdated);
+        return filmUpdated;
+    }
+
+    private void isExistsIdFilm(Integer filmId) {
+        boolean isExists = filmStorage.isExistsIdFilm(filmId);
+        if (!isExists) {
+            log.warn("Film with id={} not found", filmId);
+            throw new FilmNotFoundException(String.format("Film with id=%d not found", filmId));
+        }
     }
 
     @Override
     public Film putLike(Integer id, Long userId) {
-        Film film = getFilmById(id);
-        film.getLike().add(userId);
-        filmStorage.updateFilm(film);
+        isExistsIdFilm(id);
         log.info("User userId={} liked the film id={}", userId, id);
-        return film;
+        return filmStorage.putLike(id, userId);
     }
 
     @Override
     public Film deleteLike(Integer id, Long userId) {
-        Film film = getFilmById(id);
-        film.getLike().remove(userId);
-        filmStorage.updateFilm(film);
+        isExistsIdFilm(id);
         log.info("User id={} removed the like from the film id={}", userId, id);
-        return film;
+        return filmStorage.deleteLike(id, userId);
     }
 
     @Override
     public String deleteFilm(Integer id) {
-        checkFilmExistence(id);
+        isExistsIdFilm(id);
         filmStorage.deleteFilm(id);
-        log.info("Film with id={} removed", id);
-        return String.format("Film with id=%d removed", id);
+        log.info("Film with id={} deleted", id);
+        return String.format("Film with id=%d deleted", id);
     }
 }
