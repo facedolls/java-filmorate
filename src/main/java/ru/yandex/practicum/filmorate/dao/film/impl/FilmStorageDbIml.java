@@ -18,22 +18,22 @@ import java.util.stream.Collectors;
 public class FilmStorageDbIml implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    protected final String SQL_SELECT_ONE_FILM = "SELECT f.*, r.name AS rating_name FROM film AS f " +
+    protected final String SqlSelectOneFilm = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "WHERE film_id = :filmId";
-    protected final String SQL_SELECT_GENRES_TO_ONE_FILM = "SELECT f.*, g.name " +
+    protected final String SqlSelectGenresToOneFilm = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
             "WHERE film_id = :filmId";
-    protected final String SQL_SELECT_LIKES_TO_ONE_FILM = "SELECT * FROM favorite_film WHERE film_id = :filmId";
-    protected final String SQL_SELECT_ALL_FILMS = "SELECT f.*, r.name AS rating_name FROM film AS f " +
+    protected final String SqlSelectLikesToOneFilm = "SELECT * FROM favorite_film WHERE film_id = :filmId";
+    protected final String SqlSelectAllFilms = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "GROUP BY film_id";
-    protected final String SQL_SELECT_LIKES_ALL_FILMS = "SELECT * FROM favorite_film";
-    protected final String SQL_SELECT_GENRES_ALL_FILMS = "SELECT f.*, g.name " +
+    protected final String SqlSelectLikesAllFilms = "SELECT * FROM favorite_film";
+    protected final String SqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id";
-    protected final String SQL_SELECT_POPULARS_FILMS = "SELECT f.*, r.name AS rating_name, " +
+    protected final String SqlSelectPopularsFilms = "SELECT f.*, r.name AS rating_name, " +
             "COUNT(l.user_id) AS count_likes " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
@@ -46,24 +46,24 @@ public class FilmStorageDbIml implements FilmStorage {
             "LIMIT :count) " +
             "GROUP by f.film_id, rating_name " +
             "ORDER BY count_likes DESC";
-    protected final String SQL_SELECT_ALL_GENRES = "SELECT * FROM genre ORDER BY genre_id";
-    protected final String SQL_SELECT_ALL_RATING_MPA = "SELECT * FROM rating ORDER BY rating_id";
-    protected final String SQL_SELECT_TO_ONE_GENRE = "SELECT * FROM genre WHERE genre_id = :genreId";
-    protected final String SQL_SELECT_TO_ONE_RATING_MPA = "SELECT * FROM rating WHERE rating_id = :ratingId";
-    protected final String SQL_UPDATE_FILM = "UPDATE film SET name = :name, description = :description, " +
+    protected final String SqlSelectAllGenes = "SELECT * FROM genre ORDER BY genre_id";
+    protected final String SqlSelectAllRatingMpa = "SELECT * FROM rating ORDER BY rating_id";
+    protected final String SqlSelectToOneGenre = "SELECT * FROM genre WHERE genre_id = :genreId";
+    protected final String SqlSelectToOneRatingMpa = "SELECT * FROM rating WHERE rating_id = :ratingId";
+    protected final String SqlUpdateFilm = "UPDATE film SET name = :name, description = :description, " +
             "release_date = :release_date, duration = :duration, rating_id = :rating_id " +
             "WHERE film_id = :filmId";
-    protected final String SQL_DELETE_GENRES_FILM = "DELETE FROM film_genre WHERE film_id = :filmId";
-    protected final String SQL_INSERT_GENRES_FILM = "INSERT INTO film_genre VALUES (:filmId, :genreId)";
-    protected final String SQL_INSERT_LIKE_FILM = "INSERT INTO favorite_film VALUES (:filmId, :userId)";
-    protected final String SQL_DELETE_LIKE_FILM = "DELETE FROM favorite_film " +
+    protected final String SqlDeleteGenresFilm = "DELETE FROM film_genre WHERE film_id = :filmId";
+    protected final String SqlInsertGenresFilm = "INSERT INTO film_genre VALUES (:filmId, :genreId)";
+    protected final String SqlInsertLikeFilm = "INSERT INTO favorite_film VALUES (:filmId, :userId)";
+    protected final String SqlDeleteLikeFilm = "DELETE FROM favorite_film " +
             "WHERE film_id = :filmId AND user_id = :userId";
-    protected final String SQL_DELETE_FILM = "DELETE FROM film WHERE film_id = :filmId";
-    protected final String SQL_SELECT_ID_FILM = "SELECT film_id FROM film WHERE film_id = :filmId";
+    protected final String SqlDeleteFilm = "DELETE FROM film WHERE film_id = :filmId";
+    protected final String SqlSelectIdFilm = "SELECT film_id FROM film WHERE film_id = :filmId";
 
     @Override
     public Film getFilmsById(Integer id) {
-        Film film = parameter.query(SQL_SELECT_ONE_FILM, Map.of("filmId", id), new FilmMapper()).stream()
+        Film film = parameter.query(SqlSelectOneFilm, Map.of("filmId", id), new FilmMapper()).stream()
                 .findAny()
                 .orElse(null);
 
@@ -75,7 +75,7 @@ public class FilmStorageDbIml implements FilmStorage {
     }
 
     private void setLikesToOneFilm(Film film) {
-        Map<Integer, Set<Long>> likes = parameter.query(SQL_SELECT_LIKES_TO_ONE_FILM,
+        Map<Integer, Set<Long>> likes = parameter.query(SqlSelectLikesToOneFilm,
                 Map.of("filmId", film.getId()), new LikeFromFilmMapper());
 
         if (likes != null) {
@@ -84,7 +84,7 @@ public class FilmStorageDbIml implements FilmStorage {
     }
 
     private void setGenresToOneFilm(Film film) {
-        Map<Integer, List<Genre>> genres = parameter.query(SQL_SELECT_GENRES_TO_ONE_FILM,
+        Map<Integer, List<Genre>> genres = parameter.query(SqlSelectGenresToOneFilm,
                 Map.of("filmId", film.getId()), new GenreFromFilmMapper());
 
         if (genres != null) {
@@ -94,7 +94,7 @@ public class FilmStorageDbIml implements FilmStorage {
 
     @Override
     public Collection<Film> getAllFilms() {
-        List<Film> films = parameter.query(SQL_SELECT_ALL_FILMS, new FilmMapper());
+        List<Film> films = parameter.query(SqlSelectAllFilms, new FilmMapper());
 
         if (!films.isEmpty()) {
             films = setLikesAllFilms(films);
@@ -104,7 +104,7 @@ public class FilmStorageDbIml implements FilmStorage {
     }
 
     private List<Film> setLikesAllFilms(List<Film> films) {
-        Map<Integer, Set<Long>> likes = parameter.query(SQL_SELECT_LIKES_ALL_FILMS, new LikeFromFilmMapper());
+        Map<Integer, Set<Long>> likes = parameter.query(SqlSelectLikesAllFilms, new LikeFromFilmMapper());
         if (likes != null) {
             return films.stream()
                     .map(film -> {
@@ -119,7 +119,7 @@ public class FilmStorageDbIml implements FilmStorage {
     }
 
     private List<Film> setGenresAllFilms(List<Film> films) {
-        Map<Integer, List<Genre>> genres = parameter.query(SQL_SELECT_GENRES_ALL_FILMS, new GenreFromFilmMapper());
+        Map<Integer, List<Genre>> genres = parameter.query(SqlSelectGenresAllFilms, new GenreFromFilmMapper());
         if (genres != null) {
             return films.stream()
                     .map(film -> {
@@ -135,7 +135,7 @@ public class FilmStorageDbIml implements FilmStorage {
 
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
-        List<Film> films = parameter.query(SQL_SELECT_POPULARS_FILMS, Map.of("count", count), new FilmMapper());
+        List<Film> films = parameter.query(SqlSelectPopularsFilms, Map.of("count", count), new FilmMapper());
 
         if (!films.isEmpty()) {
             films = setLikesAllFilms(films);
@@ -146,24 +146,24 @@ public class FilmStorageDbIml implements FilmStorage {
 
     @Override
     public Collection<Genre> getAllGenres() {
-        return parameter.query(SQL_SELECT_ALL_GENRES, new GenreMapper());
+        return parameter.query(SqlSelectAllGenes, new GenreMapper());
     }
 
     @Override
     public Genre getGenreById(Integer id) {
-        return parameter.query(SQL_SELECT_TO_ONE_GENRE, Map.of("genreId", id), new GenreMapper()).stream()
+        return parameter.query(SqlSelectToOneGenre, Map.of("genreId", id), new GenreMapper()).stream()
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
     public Collection<RatingMpa> getAllMpa() {
-        return parameter.query(SQL_SELECT_ALL_RATING_MPA, new RatingMpaMapper());
+        return parameter.query(SqlSelectAllRatingMpa, new RatingMpaMapper());
     }
 
     @Override
     public RatingMpa getMpaById(Integer id) {
-        return parameter.query(SQL_SELECT_TO_ONE_RATING_MPA, Map.of("ratingId", id), new RatingMpaMapper()).stream()
+        return parameter.query(SqlSelectToOneRatingMpa, Map.of("ratingId", id), new RatingMpaMapper()).stream()
                 .findFirst()
                 .orElse(null);
     }
@@ -189,39 +189,39 @@ public class FilmStorageDbIml implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         Map<String, Object> params = getFilmParams(film);
-        parameter.update(SQL_UPDATE_FILM, params);
-        parameter.update(SQL_DELETE_GENRES_FILM, Map.of("filmId", film.getId()));
+        parameter.update(SqlUpdateFilm, params);
+        parameter.update(SqlDeleteGenresFilm, Map.of("filmId", film.getId()));
         updateGenre(film);
         return getFilmsById(film.getId());
     }
 
     private void updateGenre(Film film) {
         if (!film.getGenres().isEmpty()) {
-            film.getGenres().forEach(genre -> parameter.update(SQL_INSERT_GENRES_FILM,
+            film.getGenres().forEach(genre -> parameter.update(SqlInsertGenresFilm,
                             Map.of("filmId", film.getId(), "genreId", genre.getId())));
         }
     }
 
     @Override
     public Film putLike(Integer id, Long userId) {
-        parameter.update(SQL_INSERT_LIKE_FILM, Map.of("filmId", id, "userId", userId));
+        parameter.update(SqlInsertLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
     public Film deleteLike(Integer id, Long userId) {
-        parameter.update(SQL_DELETE_LIKE_FILM, Map.of("filmId", id, "userId", userId));
+        parameter.update(SqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
     public void deleteFilm(Integer id) {
-        parameter.update(SQL_DELETE_FILM, Map.of("filmId", id));
+        parameter.update(SqlDeleteFilm, Map.of("filmId", id));
     }
 
     @Override
     public boolean isExistsIdFilm(Integer filmId) {
-        List<Object> id = parameter.query(SQL_SELECT_ID_FILM, Map.of("filmId", filmId),
+        List<Object> id = parameter.query(SqlSelectIdFilm, Map.of("filmId", filmId),
                 (rs, rowNum) -> rs.getInt("film_id"));
         return id.size() == 1;
     }
