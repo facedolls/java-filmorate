@@ -39,7 +39,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldCreateUser() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), null);
+                LocalDate.of(1990, 1, 1), new HashSet<>());
         userStorage.createUser(user1);
 
         User result = userStorage.getUserById(1L);
@@ -53,7 +53,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldUpdateUser() {
         User userForUpdate = new User(1L, "petrovIvan@email.ru", "vanya789",
-                "Иван Петров Александрович", LocalDate.of(1991, 2, 2), null);
+                "Иван Петров Александрович", LocalDate.of(1991, 2, 2), new HashSet<>());
         userStorage.createUser(user1);
         userStorage.updateUser(userForUpdate);
 
@@ -68,7 +68,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldReturnUserById() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), null);
+                LocalDate.of(1990, 1, 1), new HashSet<>());
         userStorage.createUser(user1);
 
         User result1 = userStorage.getUserById(1L);

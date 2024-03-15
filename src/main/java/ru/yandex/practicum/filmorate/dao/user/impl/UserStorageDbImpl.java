@@ -44,26 +44,31 @@ public class UserStorageDbImpl implements UserStorage {
     protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId";
     protected final String sqlSelectIdUserElseFriendship = "SELECT user_id FROM friendship " +
             "WHERE user_id = :userId AND friend_id = :friendId";
+    protected final String sqlSelectFriendsIdForUserFriends = "SELECT * FROM friendship " +
+            "WHERE user_id IN (" +
+            "SELECT user_id FROM users " +
+            "WHERE user_id IN " +
+            "(SELECT friend_id FROM friendship " +
+            "WHERE user_id = :userId))";
+    protected final String sqlSelectIdFriendsOfMutualFriends = "SELECT * FROM friendship " +
+            "WHERE user_id in (" +
+            "SELECT user_id FROM users " +
+            "WHERE user_id IN " +
+            "(SELECT friend_id FROM friendship " +
+            "WHERE user_id = :userId OR user_id = :otherId " +
+            "GROUP BY friend_id " +
+            "HAVING COUNT(friend_id) > 1))";
 
     @Override
     public User getUserById(Long id) {
-         User user = parameter.query(sqlSelectOneUser, Map.of("userId", id), new UserMapper()).stream()
-                .findAny()
-                .orElse(null);
+        Map<String, Object> params = Map.of("userId", id);
+        List<User> user = parameter.query(sqlSelectOneUser, params, new UserMapper());
 
-        if (user != null) {
-            setFriendsToOneUser(user);
+        if (!user.isEmpty()) {
+            setFriendsUsers(user, sqlSelectIdFriendsOneUser, params);
+            return user.get(0);
         }
-        return user;
-    }
-
-    private void setFriendsToOneUser(User user) {
-        Map<Long, Set<Long>> friends = parameter.query(sqlSelectIdFriendsOneUser,
-                Map.of("userId", user.getId()), new FriendsMapper());
-
-        if (friends != null) {
-            user.setFriends(friends.get(user.getId()));
-        }
+        return null;
     }
 
     @Override
@@ -71,13 +76,13 @@ public class UserStorageDbImpl implements UserStorage {
         List<User> users = parameter.query(sqlSelectAllUser, new UserMapper());
 
         if (!users.isEmpty()) {
-            return setFriendsAllUsers(users);
+            return setFriendsUsers(users, sqlSelectIdFriendsAllUser, null);
         }
         return users;
     }
 
-    private List<User> setFriendsAllUsers(List<User> users) {
-        Map<Long, Set<Long>> friends = parameter.query(sqlSelectIdFriendsAllUser, new FriendsMapper());
+    private List<User> setFriendsUsers(List<User> users, String sqlQueryForGettingFriends, Map<String, Object> params) {
+        Map<Long, Set<Long>> friends = returnFriendsInMap(sqlQueryForGettingFriends, params);
         if (friends != null) {
             return users.stream()
                     .map(user -> {
@@ -91,24 +96,31 @@ public class UserStorageDbImpl implements UserStorage {
         return users;
     }
 
+    private Map<Long, Set<Long>> returnFriendsInMap(String sqlQuery, Map<String, Object> params) {
+        if (params != null) {
+            return parameter.query(sqlQuery, params, new FriendsMapper());
+        }
+        return parameter.query(sqlQuery, new FriendsMapper());
+    }
+
     @Override
     public Collection<User> getFriends(Long id) {
-        List<User> friendsUser = parameter.query(sqlSelectFriendsOneUser,
-                Map.of("userId", id), new UserMapper());
+        Map<String, Object> params = Map.of("userId", id);
+        List<User> friendsUser = parameter.query(sqlSelectFriendsOneUser, params, new UserMapper());
 
         if (!friendsUser.isEmpty()) {
-            return setFriendsAllUsers(friendsUser);
+            return setFriendsUsers(friendsUser, sqlSelectFriendsIdForUserFriends, params);
         }
         return friendsUser;
     }
 
     @Override
     public Collection<User> getMutualFriends(Long id, Long otherId) {
-        List<User> mutualFriends = parameter.query(sqlSelectMutualFriends,
-                Map.of("userId", id, "otherId", otherId), new UserMapper());
+        Map<String, Object> params = Map.of("userId", id, "otherId", otherId);
+        List<User> mutualFriends = parameter.query(sqlSelectMutualFriends, params, new UserMapper());
 
         if (!mutualFriends.isEmpty()) {
-            return setFriendsAllUsers(mutualFriends);
+            return setFriendsUsers(mutualFriends, sqlSelectIdFriendsOfMutualFriends, params);
         }
         return mutualFriends;
     }

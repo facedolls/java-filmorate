@@ -7,26 +7,34 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class FriendsMapper implements ResultSetExtractor<Map<Long, Set<Long>>> {
-    private final Map<Long, Set<Long>> friendsUser = new HashMap<>();
-    private Set<Long> friends = new HashSet<>();
-    private Long userId = 0L;
+    private final Map<Long, Set<Long>> friendsOfUsers = new HashMap<>();
+    private Set<Long> friendsOfOneUser = new HashSet<>();
 
     @Override
     public Map<Long, Set<Long>> extractData(ResultSet rs) throws SQLException, DataAccessException {
         while (rs.next()) {
-            if (isAllFriendsUser(rs)) {
-                friendsUser.put(userId, friends);
-                friends = new HashSet<>();
+            if (isUserFriendsInMap(rs)) {
+                addToExistingSet(rs);
+            } else {
+                addNewSet(rs);
             }
-            userId = rs.getLong("user_id");
-            friends.add(rs.getLong("friend_id"));
         }
-
-        friendsUser.put(userId, friends);
-        return friendsUser;
+        return friendsOfUsers;
     }
 
-    private boolean isAllFriendsUser(ResultSet rs) throws SQLException {
-        return rs.getLong("user_id") != userId && userId != 0L;
+    private boolean isUserFriendsInMap(ResultSet rs) throws SQLException {
+        return friendsOfUsers.containsKey(rs.getLong("user_id"));
+    }
+
+    private void addToExistingSet(ResultSet rs) throws SQLException {
+        Set<Long> friends = friendsOfUsers.get(rs.getLong("user_id"));
+        friends.add(rs.getLong("friend_id"));
+        friendsOfUsers.put(rs.getLong("user_id"), friends);
+    }
+
+    private void addNewSet(ResultSet rs) throws SQLException {
+        friendsOfOneUser.add(rs.getLong("friend_id"));
+        friendsOfUsers.put(rs.getLong("user_id"), friendsOfOneUser);
+        friendsOfOneUser = new HashSet<>();
     }
 }
