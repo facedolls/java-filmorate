@@ -180,8 +180,8 @@ public class FilmStorageDbImlTest {
                         new RatingMpa(3, "PG-13"), new HashSet<>(), List.of(new Genre(1, "Комедия"))),
                 new Film(4,"Хитрый лис", "Сказка о лисенке",
                         LocalDate.of(2010, 7, 3), 70, new RatingMpa(1, "G"),
-                        new HashSet<>(), List.of(new Genre(3, "Мультфильм"),
-                        new Genre(1, "Комедия"))));
+                        new HashSet<>(), List.of(new Genre(1, "Комедия"),
+                        new Genre(3, "Мультфильм"))));
 
         Collection<Film> result = filmStorage.getAllFilms();
         assertThat(result)
