@@ -26,7 +26,7 @@ public class LikeFromFilmMapper implements ResultSetExtractor<Map<Integer, Set<L
     }
 
     private void addToExistingSet(ResultSet rs) throws SQLException {
-        Set<Long> likes= likesOfFilms.get(rs.getInt("film_id"));
+        Set<Long> likes = likesOfFilms.get(rs.getInt("film_id"));
         likes.add(rs.getLong("user_id"));
         likesOfFilms.put(rs.getInt("film_id"), likes);
     }
