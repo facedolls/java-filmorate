@@ -9,7 +9,6 @@ import java.util.*;
 
 public class GenreFromFilmMapper implements ResultSetExtractor<Map<Integer, List<Genre>>> {
     private final Map<Integer, List<Genre>> genresOfFilms = new HashMap<>();
-    private List<Genre> genresOfOneFilm = new LinkedList<>();
 
     @Override
     public Map<Integer, List<Genre>> extractData(ResultSet rs) throws DataAccessException, SQLException {
@@ -34,8 +33,8 @@ public class GenreFromFilmMapper implements ResultSetExtractor<Map<Integer, List
     }
 
     private void addNewList(ResultSet rs) throws SQLException {
+        List<Genre> genresOfOneFilm = new LinkedList<>();
         genresOfOneFilm.add(new Genre(rs.getInt("genre_id"), rs.getString("name")));
         genresOfFilms.put(rs.getInt("film_id"), genresOfOneFilm);
-        genresOfOneFilm = new LinkedList<>();
     }
 }

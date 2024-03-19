@@ -8,7 +8,6 @@ import java.util.*;
 
 public class FriendsMapper implements ResultSetExtractor<Map<Long, Set<Long>>> {
     private final Map<Long, Set<Long>> friendsOfUsers = new HashMap<>();
-    private Set<Long> friendsOfOneUser = new HashSet<>();
 
     @Override
     public Map<Long, Set<Long>> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -33,8 +32,8 @@ public class FriendsMapper implements ResultSetExtractor<Map<Long, Set<Long>>> {
     }
 
     private void addNewSet(ResultSet rs) throws SQLException {
+        Set<Long> friendsOfOneUser = new HashSet<>();
         friendsOfOneUser.add(rs.getLong("friend_id"));
         friendsOfUsers.put(rs.getLong("user_id"), friendsOfOneUser);
-        friendsOfOneUser = new HashSet<>();
     }
 }

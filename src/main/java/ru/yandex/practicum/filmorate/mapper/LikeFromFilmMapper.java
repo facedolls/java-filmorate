@@ -7,7 +7,6 @@ import java.util.*;
 
 public class LikeFromFilmMapper implements ResultSetExtractor<Map<Integer, Set<Long>>> {
     private final Map<Integer, Set<Long>> likesOfFilms = new HashMap<>();
-    private Set<Long> likesOfOneFilm = new HashSet<>();
 
     @Override
     public Map<Integer, Set<Long>> extractData(ResultSet rs) throws DataAccessException, SQLException {
@@ -32,8 +31,8 @@ public class LikeFromFilmMapper implements ResultSetExtractor<Map<Integer, Set<L
     }
 
     private void addNewSet(ResultSet rs) throws SQLException {
+        Set<Long> likesOfOneFilm = new HashSet<>();
         likesOfOneFilm.add(rs.getLong("user_id"));
         likesOfFilms.put(rs.getInt("film_id"), likesOfOneFilm);
-        likesOfOneFilm = new HashSet<>();
     }
 }
