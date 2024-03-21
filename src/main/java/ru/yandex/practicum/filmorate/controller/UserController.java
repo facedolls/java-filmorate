@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import java.util.*;
@@ -20,25 +21,21 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public User getUserById(@PathVariable @NotNull @Min(1) Long id) {
         return userService.getUserById(id);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}/friends")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getFriends(@PathVariable @NotNull @Min(1) Long id) {
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<User> getMutualFriends(@PathVariable @NotNull @Min(1) Long id,
                                              @PathVariable @NotNull @Min(1) Long otherId) {
         return userService.getMutualFriends(id, otherId);
@@ -47,30 +44,31 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Valid @RequestBody User user) {
+        if (user.getId() != 0) {
+            log.warn("Incorrect id={} was passed when creating the user: ", user.getId());
+            throw new ValidationException("id for the user must not be specified");
+        }
         return userService.createUser(user);
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     public User updateUser(@Valid @RequestBody User user) {
         return userService.updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.OK)
-    public String addInFriend(@PathVariable @NotNull @Min(1) Long id, @PathVariable @NotNull @Min(1) Long friendId) {
-        return userService.addInFriend(id,  friendId);
+    public User addInFriend(@PathVariable @NotNull @Min(1) Long id,
+                              @PathVariable @NotNull @Min(1) Long friendId) {
+        return userService.addInFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.OK)
     public String deleteForFriends(@PathVariable @NotNull @Min(1) Long id,
                                    @PathVariable @NotNull @Min(1) Long friendId) {
-        return userService.deleteForFriends(id, friendId);
+        return userService.deleteFromFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public String deleteUser(@PathVariable @NotNull @Min(1) Long id) {
         return userService.deleteUser(id);
     }

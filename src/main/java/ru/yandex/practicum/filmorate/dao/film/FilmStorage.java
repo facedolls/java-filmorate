@@ -1,10 +1,10 @@
-package ru.yandex.practicum.filmorate.service.film;
+package ru.yandex.practicum.filmorate.dao.film;
 
 import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
 
-public interface FilmService {
-    Film getFilmById(Integer id);
+public interface FilmStorage {
+    Film getFilmsById(Integer id);
 
     Collection<Film> getAllFilms();
 
@@ -22,9 +22,11 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
+    void deleteFilm(Integer id);
+
     Film putLike(Integer id, Long userId);
 
     Film deleteLike(Integer id, Long userId);
 
-    String deleteFilm(Integer id);
+    boolean isExistsIdFilm(Integer filmId);
 }

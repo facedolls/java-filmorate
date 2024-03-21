@@ -2,13 +2,14 @@ package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.validator.date.AfterMinDate;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Film {
     private int id;
     @NotBlank
@@ -20,14 +21,20 @@ public class Film {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @AfterMinDate(value = "1895-12-28")
     private LocalDate releaseDate;
+    @NotNull
     @Positive
     private int duration;
-    private Set<Long> like = new HashSet<>();
+    @NotNull
+    private RatingMpa mpa;
+    private List<Genre> genres = new ArrayList<>();
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    public Film(String name, String description, LocalDate releaseDate, int duration,
+                RatingMpa mpa, List<Genre> genres) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
     }
 }

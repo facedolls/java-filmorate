@@ -16,9 +16,9 @@ public interface UserService {
 
     User updateUser(User user);
 
-    String addInFriend(Long id, Long friendId);
+    User addInFriend(Long id, Long friendId);
 
-    String deleteForFriends(Long id, Long friendId);
+    String deleteFromFriends(Long id, Long friendId);
 
     String deleteUser(Long id);
 }
