@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.*;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,11 +25,9 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
             "WHERE film_id = :filmId";
-    protected final String sqlSelectLikesToOneFilm = "SELECT * FROM favorite_film WHERE film_id = :filmId";
     protected final String sqlSelectAllFilms = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "GROUP BY film_id";
-    protected final String sqlSelectLikesAllFilms = "SELECT * FROM favorite_film";
     protected final String sqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id";
@@ -71,27 +69,19 @@ public class FilmStorageDbImpl implements FilmStorage {
             "ORDER BY COUNT(fm.film_id) DESC " +
             "LIMIT :count) " +
             "GROUP BY f.film_id, f.genre_id, g.name";
-    protected final String sqlSelectPopularFilmsLikes = "SELECT f.*, COUNT(user_id) as count_likes " +
-            "FROM favorite_film AS f " +
-            "WHERE film_id IN (" +
-            "SELECT fm.film_id FROM film AS fm " +
-            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
-            "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(fm.film_id) DESC " +
-            "LIMIT :count) " +
-            "GROUP BY f.film_id, f.user_id";
 
     @Override
     public Film getFilmsById(Integer id) {
         Map<String, Object> params = Map.of("filmId", id);
         List<Film> film = parameter.query(sqlSelectOneFilm, params, new FilmMapper());
 
-        if (!film.isEmpty()) {
-            setLikesFilms(film, sqlSelectLikesToOneFilm, params);
-            setGenresFilms(film, sqlSelectGenresToOneFilm, params);
-            return film.get(0);
+        if (film.isEmpty()) {
+            return null;
         }
-        return null;
+
+        Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresToOneFilm, params, new GenreFromFilmMapper());
+        setGenresFilms(film, genres);
+        return film.get(0);
     }
 
     @Override
@@ -99,37 +89,13 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Film> films = parameter.query(sqlSelectAllFilms, new FilmMapper());
 
         if (!films.isEmpty()) {
-            films = setLikesFilms(films, sqlSelectLikesAllFilms, null);
-            films = setGenresFilms(films, sqlSelectGenresAllFilms, null);
+            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
+            films = setGenresFilms(films, genres);
         }
         return films;
     }
 
-    private List<Film> setLikesFilms(List<Film> films, String sqlQueryForGettingLikes, Map<String, Object> params) {
-        Map<Integer, Set<Long>> likes = returnLikesInMap(sqlQueryForGettingLikes, params);
-
-        if (likes != null) {
-            return films.stream()
-                    .map(film -> {
-                        if (likes.containsKey(film.getId())) {
-                            film.setLike(likes.get(film.getId()));
-                            return film;
-                        }
-                        return film;
-                    }).collect(Collectors.toList());
-        }
-        return films;
-    }
-
-    private Map<Integer, Set<Long>> returnLikesInMap(String sqlQuery, Map<String, Object> params) {
-        if (params != null) {
-            return parameter.query(sqlQuery, params, new LikeFromFilmMapper());
-        }
-        return parameter.query(sqlQuery, new LikeFromFilmMapper());
-    }
-
-    private List<Film> setGenresFilms(List<Film> films, String sqlQueryForGettingGenres, Map<String, Object> params) {
-        Map<Integer, List<Genre>> genres = returnGenresInMap(sqlQueryForGettingGenres, params);
+    private List<Film> setGenresFilms(List<Film> films, Map<Integer, List<Genre>> genres) {
         if (genres != null) {
             return films.stream()
                     .map(film -> {
@@ -143,21 +109,16 @@ public class FilmStorageDbImpl implements FilmStorage {
         return films;
     }
 
-    private Map<Integer, List<Genre>> returnGenresInMap(String sqlQuery, Map<String, Object> params) {
-        if (params != null) {
-            return parameter.query(sqlQuery, params, new GenreFromFilmMapper());
-        }
-        return parameter.query(sqlQuery, new GenreFromFilmMapper());
-    }
-
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
         Map<String, Object> params = Map.of("count", count);
         List<Film> films = parameter.query(sqlSelectPopularsFilms, params, new FilmMapper());
 
         if (!films.isEmpty()) {
-            films = setLikesFilms(films, sqlSelectPopularFilmsLikes, params);
-            films = setGenresFilms(films, sqlSelectPopularFilmsGenres, params);
+            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectPopularFilmsGenres, params,
+                    new GenreFromFilmMapper());
+
+            films = setGenresFilms(films, genres);
         }
         return films;
     }

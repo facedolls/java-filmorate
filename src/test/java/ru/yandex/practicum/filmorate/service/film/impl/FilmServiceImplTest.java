@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
 import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +23,7 @@ public class FilmServiceImplTest {
     public void setUp() {
         filmService = new FilmServiceImpl(filmStorage);
         film1 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
-                new RatingMpa(1, "G"), null, List.of(new Genre(1, "Комедия")));
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
     }
 
     @DisplayName("Должен выдать исключение FilmNotFoundException и не найти id фильма")

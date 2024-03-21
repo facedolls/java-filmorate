@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.FriendsMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import java.util.*;
 import java.util.stream.Collectors;
 

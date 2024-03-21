@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDbImpl;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -26,23 +26,10 @@ public class Film {
     private int duration;
     @NotNull
     private RatingMpa mpa;
-    private Set<Long> like = new HashSet<>();
     private List<Genre> genres = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, int duration,
-                RatingMpa mpa, Set<Long> like, List<Genre> genres) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-        this.like = like;
-        this.genres = genres;
-    }
-
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration,
                 RatingMpa mpa, List<Genre> genres) {
-        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
