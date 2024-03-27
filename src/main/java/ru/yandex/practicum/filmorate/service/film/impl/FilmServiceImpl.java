@@ -74,6 +74,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film createFilm(Film film) {
         isExistsRatingMpa(film);
+        isExistsGenres(film);
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;
@@ -88,10 +89,22 @@ public class FilmServiceImpl implements FilmService {
         }
     }
 
+    private void isExistsGenres(Film film) {
+        film.getGenres().forEach(genreFilm -> {
+            Genre genre = filmStorage.getGenreById(genreFilm.getId());
+            if (genre == null) {
+                log.warn("Genre with id={} not already exist", genreFilm.getId());
+                throw new ValidationException(String.format(
+                        "Genre with id=%d not already exist", genreFilm.getId()));
+            }
+        });
+    }
+
     @Override
     public Film updateFilm(Film film) {
         isExistsIdFilm(film.getId());
         isExistsRatingMpa(film);
+        isExistsGenres(film);
         Film filmUpdated = filmStorage.updateFilm(film);
         log.info("Update film {}", filmUpdated);
         return filmUpdated;
