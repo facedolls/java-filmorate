@@ -176,7 +176,8 @@ public class FilmStorageDbImpl implements FilmStorage {
 
     private void updateGenre(Film film) {
         if (!film.getGenres().isEmpty()) {
-            film.getGenres().forEach(genre -> parameter.update(sqlInsertGenresFilm,
+            Set<Genre> genres = new HashSet<>(film.getGenres());
+            genres.forEach(genre -> parameter.update(sqlInsertGenresFilm,
                     Map.of("filmId", film.getId(), "genreId", genre.getId())));
         }
     }
