@@ -28,16 +28,16 @@ public class ReviewController {
     }
 
     @GetMapping
-    public Collection<Review> getReviews(@RequestParam(required = false) Long filmId,
-                                         @RequestParam(defaultValue = "10") Integer count) {
+    public Collection<Review> getReviews(@RequestParam Long filmId,
+                                         @RequestParam(defaultValue = 10) Integer count) {
         return reviewService.getReviews(filmId, count);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Review createReview(@Valid @RequestBody Review review) {
-        if (review.getReviewId() != 0) {
-            log.warn("Incorrect id={} was passed when creating the review: ", review.getReviewId());
+        if (review.getId() != 0) {
+            log.warn("Incorrect id={} was passed when creating the review: ", review.getId());
             throw new ValidationException("id for the review must not be specified");
         }
         return reviewService.createReview(review);
@@ -51,25 +51,25 @@ public class ReviewController {
     @PutMapping("/{id}/like/{userId}")
     public String addLike(@PathVariable @NotNull @Min(1) Long id,
                             @PathVariable @NotNull @Min(1) Long userId) {
-        return reviewService.addLike(id, userId);
+        reviewService.addLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public String addDislike(@PathVariable @NotNull @Min(1) Long id,
                           @PathVariable @NotNull @Min(1) Long userId) {
-        return reviewService.addDislike(id, userId);
+        reviewService.addDislike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public String deleteLike(@PathVariable @NotNull @Min(1) Long id,
                            @PathVariable @NotNull @Min(1) Long userId) {
-        return reviewService.deleteLike(id, userId);
+        reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public String deleteDislike(@PathVariable @NotNull @Min(1) Long id,
                            @PathVariable @NotNull @Min(1) Long userId) {
-        return reviewService.deleteDislike(id, userId);
+        reviewService.deleteDislike(id, userId);
     }
 
     @DeleteMapping("/{id}")
