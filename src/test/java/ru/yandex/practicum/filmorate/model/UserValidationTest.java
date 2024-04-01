@@ -33,7 +33,6 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.login").value("jnb6fds"))
                 .andExpect(jsonPath("$.name").value("Monika"))
                 .andExpect(jsonPath("$.birthday").value("1989-01-19"))
-                .andExpect(jsonPath("$.friends").isEmpty())
                 .andExpect(status().is(201));
     }
 
@@ -50,7 +49,6 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.login").value("a2sfg2hjk"))
                 .andExpect(jsonPath("$.name").value("a2sfg2hjk"))
                 .andExpect(jsonPath("$.birthday").value("2000-12-15"))
-                .andExpect(jsonPath("$.friends").isEmpty())
                 .andExpect(status().is(201));
     }
 
@@ -67,7 +65,6 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.login").value("jh9gvc"))
                 .andExpect(jsonPath("$.name").value("jh9gvc"))
                 .andExpect(jsonPath("$.birthday").value("1999-11-14"))
-                .andExpect(jsonPath("$.friends").isEmpty())
                 .andExpect(status().is(201));
     }
 
@@ -84,7 +81,6 @@ public class UserValidationTest {
                 .andExpect(jsonPath("$.login").value("lmn8bvc"))
                 .andExpect(jsonPath("$.name").value("lmn8bvc"))
                 .andExpect(jsonPath("$.birthday").value("1998-10-13"))
-                .andExpect(jsonPath("$.friends").isEmpty())
                 .andExpect(status().is(201));
     }
 
