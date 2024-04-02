@@ -25,9 +25,12 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
             "WHERE film_id = :filmId";
+
     protected final String sqlSelectAllFilms = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
-            "GROUP BY film_id";
+            "GROUP BY film_id, rating_name " +
+            "ORDER BY film_id";
+
     protected final String sqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id";
@@ -161,7 +164,7 @@ public class FilmStorageDbImpl implements FilmStorage {
 
     private Map<String, Object> getFilmParams(Film film) {
         return Map.of("name", film.getName(), "description", film.getDescription(),
-                "release_date", film.getReleaseDate().toString(), "duration", film.getDuration(),
+                "release_date", film.getReleaseDate(), "duration", film.getDuration(),
                 "rating_id", film.getMpa().getId(), "filmId", film.getId());
     }
 
