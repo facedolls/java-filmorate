@@ -27,4 +27,6 @@ public interface FilmService {
     Film deleteLike(Integer id, Long userId);
 
     String deleteFilm(Integer id);
+
+    public void isExistsIdFilm(Integer filmId);
 }
