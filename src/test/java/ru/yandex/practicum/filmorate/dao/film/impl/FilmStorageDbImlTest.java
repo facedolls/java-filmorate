@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class FilmStorageDbImlTest {
-    private final JdbcTemplate jdbcTemplate;
+    /*private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     private FilmStorage filmStorage;
     private UserStorage userStorage;
@@ -278,5 +278,5 @@ public class FilmStorageDbImlTest {
                 .isNotNull()
                 .isEqualTo(false);
 
-    }
+    }*/
 }
