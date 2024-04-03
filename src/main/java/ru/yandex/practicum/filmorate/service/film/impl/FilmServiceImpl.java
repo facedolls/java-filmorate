@@ -75,6 +75,7 @@ public class FilmServiceImpl implements FilmService {
     public Film createFilm(Film film) {
         isExistsRatingMpa(film);
         isExistsGenres(film);
+        film.getDirectors().forEach(director -> isExistsIdDirector(director.getId()));
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;
@@ -100,11 +101,20 @@ public class FilmServiceImpl implements FilmService {
         });
     }
 
+    private void isExistsIdDirector(Integer directorId) {
+        Director director = filmStorage.getDirectorById(directorId);
+        if (director == null) {
+            log.warn("Director with id={} not already exist", directorId);
+            throw new ValidationException(String.format("Director with id=%d not already exist", directorId));
+        }
+    }
+
     @Override
     public Film updateFilm(Film film) {
         isExistsIdFilm(film.getId());
         isExistsRatingMpa(film);
         isExistsGenres(film);
+        film.getDirectors().forEach(director -> isExistsIdDirector(director.getId()));
         Film filmUpdated = filmStorage.updateFilm(film);
         log.info("Update film {}", filmUpdated);
         return filmUpdated;
@@ -138,5 +148,53 @@ public class FilmServiceImpl implements FilmService {
         filmStorage.deleteFilm(id);
         log.info("Film with id={} deleted", id);
         return String.format("Film with id=%d deleted", id);
+    }
+
+    @Override
+    public Collection<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        getDirectorById(directorId);
+        if (sortBy.equals("likes") || sortBy.equals("year")) {
+            log.info("Received films by director with id={}", directorId);
+            return filmStorage.getFilmsByDirector(directorId, sortBy);
+        }
+        log.warn("Unknown argument value sortBy={}", sortBy);
+        throw new IllegalArgumentException("Argument value \"sortBy\" should be likes or year");
+    }
+
+    @Override
+    public Collection<Director> getAllDirectors() {
+        log.info("Received all directors");
+        return filmStorage.getAllDirectors();
+    }
+
+    @Override
+    public Director getDirectorById(Integer directorId) {
+        Director director = filmStorage.getDirectorById(directorId);
+        if (director == null) {
+            log.warn("Director with id={} not found", directorId);
+            throw new NotFoundException(String.format("Director with id=%d not found", directorId));
+        }
+        return director;
+    }
+
+    @Override
+    public Director createDirector(Director director) {
+        log.info("Create director={}", director);
+        return filmStorage.createDirector(director);
+    }
+
+    @Override
+    public Director updateDirector(Director director) {
+        getDirectorById(director.getId());
+        log.info("Update director={}", director);
+        return filmStorage.updateDirector(director);
+    }
+
+    @Override
+    public String deleteDirector(Integer directorId) {
+        getDirectorById(directorId);
+        filmStorage.deleteDirector(directorId);
+        log.info("Director with id={} deleted", directorId);
+        return String.format("Director with id=%d deleted", directorId);
     }
 }

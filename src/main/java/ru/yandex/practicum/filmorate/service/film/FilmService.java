@@ -27,4 +27,16 @@ public interface FilmService {
     Film deleteLike(Integer id, Long userId);
 
     String deleteFilm(Integer id);
+
+    Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    Collection<Director> getAllDirectors();
+
+    Director getDirectorById(Integer id);
+
+    Director createDirector(Director director);
+
+    Director updateDirector(Director director);
+
+    String deleteDirector(Integer id);
 }

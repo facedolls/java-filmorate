@@ -29,4 +29,16 @@ public interface FilmStorage {
     Film deleteLike(Integer id, Long userId);
 
     boolean isExistsIdFilm(Integer filmId);
+
+    Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    Collection<Director> getAllDirectors();
+
+    Director getDirectorById(Integer directorId);
+
+    Director createDirector(Director director);
+
+    Director updateDirector(Director director);
+
+    void deleteDirector(Integer directorId);
 }

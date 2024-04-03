@@ -30,7 +30,6 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "GROUP BY film_id, rating_name " +
             "ORDER BY film_id";
-
     protected final String sqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id";
@@ -39,14 +38,9 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
-            "WHERE f.film_id IN (" +
-            "SELECT fm.film_id FROM film AS fm " +
-            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
-            "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(fm.film_id) DESC " +
-            "LIMIT :count) " +
-            "GROUP by f.film_id, rating_name " +
-            "ORDER BY count_likes DESC";
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(l.user_id) DESC " +
+            "LIMIT :count";
     protected final String sqlSelectAllGenes = "SELECT * FROM genre ORDER BY genre_id";
     protected final String sqlSelectAllRatingMpa = "SELECT * FROM rating ORDER BY rating_id";
     protected final String sqlSelectToOneGenre = "SELECT * FROM genre WHERE genre_id = :genreId";
@@ -69,9 +63,54 @@ public class FilmStorageDbImpl implements FilmStorage {
             "SELECT fm.film_id FROM film AS fm " +
             "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
             "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(fm.film_id) DESC " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
             "LIMIT :count) " +
             "GROUP BY f.film_id, f.genre_id, g.name";
+    protected final String sqlSelectDirectorsToOneFilm = "SELECT f.*, d.name " +
+            "FROM film_director AS f " +
+            "JOIN director AS d ON f.director_id = d.director_id " +
+            "WHERE film_id = :filmId";
+    protected final String sqlSelectDirectorsAllFilms = "SELECT f.*, d.name " +
+            "FROM film_director AS f " +
+            "JOIN director AS d ON f.director_id = d.director_id";
+    protected final String sqlSelectPopularFilmsDirectors = "SELECT f.*, d.name, COUNT(user_id) as count_likes " +
+            "FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) desc, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.director_id, d.name";
+    protected final String sqlInsertDirectorsFilm = "INSERT INTO film_director VALUES (:filmId, :directorId)";
+    protected final String sqlSelectAllDirectors = "SELECT * FROM director";
+    protected final String sqlSelectToOneDirector = "SELECT * FROM director WHERE director_id = :directorId";
+    protected final String sqlUpdateDirector = "UPDATE director SET name = :name WHERE director_id = :directorId";
+    protected final String sqlDeleteDirector = "DELETE FROM director WHERE director_id = :directorId";
+    protected final String sqlDeleteDirectorsFilm = "DELETE FROM film_director WHERE film_id = :filmId";
+    protected final String sqlSelectFilmsByDirectorAndLike = "SELECT f.*, r.name AS rating_name FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "JOIN film_director AS fd ON f.film_id = fd.film_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE director_id = :directorId " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(ff.film_id) DESC";
+    protected final String sqlSelectFilmsByDirectorAndYear = "SELECT f.*, r.name AS rating_name FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "JOIN film_director AS fd ON f.film_id = fd.film_id " +
+            "WHERE director_id = :directorId " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY release_date";
+    protected final String sqlSelectFilmsByDirectorDirectors = "SELECT f.*, d.name FROM film_director AS f " +
+            "JOIN director AS d ON f.director_id = d.director_id " +
+            "WHERE d.director_id = :directorId";
+    protected final String sqlSelectFilmsByDirectorGenres = "SELECT fg.*, g.name FROM film_genre AS fg " +
+            "JOIN genre AS g ON fg.genre_id = g.genre_id " +
+            "JOIN film_director AS ff ON fg.film_id = ff.film_id " +
+            "JOIN director AS d ON d.director_id = ff.director_id " +
+            "WHERE d.director_id = :directorId";
 
     @Override
     public Film getFilmsById(Integer id) {
@@ -81,10 +120,18 @@ public class FilmStorageDbImpl implements FilmStorage {
         if (film.isEmpty()) {
             return null;
         }
-
-        Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresToOneFilm, params, new GenreFromFilmMapper());
-        setGenresFilms(film, genres);
+        film = setFilmsWithGenresAndDirectors(film, params, sqlSelectGenresToOneFilm, sqlSelectDirectorsToOneFilm);
         return film.get(0);
+    }
+
+    private List<Film> setFilmsWithGenresAndDirectors(List<Film> films, Map<String, Object> params,
+                                                         String sqlGenres, String sqlDirectors) {
+        Map<Integer, List<Genre>> genres = parameter.query(sqlGenres, params, new GenreFromFilmMapper());
+        films = setGenresFilms(films, genres);
+
+        Map<Integer, List<Director>> directors = parameter.query(sqlDirectors, params, new DirectorFromFilmMapper());
+        films = setDirectorsFilms(films, directors);
+        return films;
     }
 
     @Override
@@ -94,6 +141,10 @@ public class FilmStorageDbImpl implements FilmStorage {
         if (!films.isEmpty()) {
             Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
             films = setGenresFilms(films, genres);
+
+            Map<Integer, List<Director>> directors = parameter.query(sqlSelectDirectorsAllFilms,
+                    new DirectorFromFilmMapper());
+            films = setDirectorsFilms(films, directors);
         }
         return films;
     }
@@ -112,16 +163,28 @@ public class FilmStorageDbImpl implements FilmStorage {
         return films;
     }
 
+    private List<Film> setDirectorsFilms(List<Film> films, Map<Integer, List<Director>> directors) {
+        if (directors != null) {
+            return films.stream()
+                    .map(film -> {
+                        if (directors.containsKey(film.getId())) {
+                            film.setDirectors(directors.get(film.getId()));
+                            return film;
+                        }
+                        return film;
+                    }).collect(Collectors.toList());
+        }
+        return films;
+    }
+
     @Override
     public Collection<Film> getPopularFilm(Integer count) {
         Map<String, Object> params = Map.of("count", count);
         List<Film> films = parameter.query(sqlSelectPopularsFilms, params, new FilmMapper());
 
         if (!films.isEmpty()) {
-            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectPopularFilmsGenres, params,
-                    new GenreFromFilmMapper());
-
-            films = setGenresFilms(films, genres);
+            films = setFilmsWithGenresAndDirectors(films, params, sqlSelectPopularFilmsGenres,
+                    sqlSelectPopularFilmsDirectors);
         }
         return films;
     }
@@ -159,6 +222,7 @@ public class FilmStorageDbImpl implements FilmStorage {
         Map<String, Object> params = getFilmParams(film);
         film.setId(insertFilm.executeAndReturnKey(params).intValue());
         updateGenre(film);
+        updateDirectorFromFilm(film);
         return getFilmsById(film.getId());
     }
 
@@ -173,7 +237,10 @@ public class FilmStorageDbImpl implements FilmStorage {
         Map<String, Object> params = getFilmParams(film);
         parameter.update(sqlUpdateFilm, params);
         parameter.update(sqlDeleteGenresFilm, Map.of("filmId", film.getId()));
+        parameter.update(sqlDeleteDirectorsFilm, Map.of("filmId", film.getId()));
+
         updateGenre(film);
+        updateDirectorFromFilm(film);
         return getFilmsById(film.getId());
     }
 
@@ -182,6 +249,14 @@ public class FilmStorageDbImpl implements FilmStorage {
             Set<Genre> genres = new HashSet<>(film.getGenres());
             genres.forEach(genre -> parameter.update(sqlInsertGenresFilm,
                     Map.of("filmId", film.getId(), "genreId", genre.getId())));
+        }
+    }
+
+    private void updateDirectorFromFilm(Film film) {
+        if (!film.getDirectors().isEmpty()) {
+            Set<Director> directors = new HashSet<>(film.getDirectors());
+            directors.forEach(director -> parameter.update(sqlInsertDirectorsFilm,
+                    Map.of("filmId", film.getId(), "directorId", director.getId())));
         }
     }
 
@@ -207,5 +282,57 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Object> id = parameter.query(sqlSelectIdFilm, Map.of("filmId", filmId),
                 (rs, rowNum) -> rs.getInt("film_id"));
         return id.size() == 1;
+    }
+
+    @Override
+    public Collection<Film> getFilmsByDirector(Integer directorId, String sortBy) { // TODO
+        Map<String, Object> params = Map.of("directorId", directorId);
+        if (sortBy.equals("likes")) {
+            return sortFilmsByDirectorAndArgument(params, sqlSelectFilmsByDirectorAndLike);
+        }
+        return sortFilmsByDirectorAndArgument(params, sqlSelectFilmsByDirectorAndYear);
+    }
+
+    private Collection<Film> sortFilmsByDirectorAndArgument(Map<String, Object> params, String sqlFilms) {
+        List<Film> films = parameter.query(sqlFilms, params, new FilmMapper());
+        if (!films.isEmpty()) {
+            return setFilmsWithGenresAndDirectors(films, params,
+                    sqlSelectFilmsByDirectorGenres, sqlSelectFilmsByDirectorDirectors);
+        }
+        return films;
+    }
+
+    @Override
+    public Collection<Director> getAllDirectors() {
+        return parameter.query(sqlSelectAllDirectors, new DirectorMapper());
+    }
+
+    @Override
+    public Director getDirectorById(Integer id) {
+        return parameter.query(sqlSelectToOneDirector, Map.of("directorId", id), new DirectorMapper()).stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public Director createDirector(Director director) {
+        SimpleJdbcInsert insertDirector = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("director")
+                .usingGeneratedKeyColumns("director_id");
+
+        director.setId(insertDirector.executeAndReturnKey(Map.of("name", director.getName())).intValue());
+        return getDirectorById(director.getId());
+    }
+
+    @Override
+    public Director updateDirector(Director director) {
+        Map<String, Object> params = Map.of("name", director.getName(), "directorId", director.getId());
+        parameter.update(sqlUpdateDirector, params);
+        return getDirectorById(director.getId());
+    }
+
+    @Override
+    public void deleteDirector(Integer id) {
+        parameter.update(sqlDeleteDirector, Map.of("directorId", id));
     }
 }
