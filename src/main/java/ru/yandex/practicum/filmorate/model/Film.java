@@ -27,14 +27,16 @@ public class Film {
     @NotNull
     private RatingMpa mpa;
     private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, int duration,
-                RatingMpa mpa, List<Genre> genres) {
+                RatingMpa mpa, List<Genre> genres, List<Director> directors) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
     }
 }

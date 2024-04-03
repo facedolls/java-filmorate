@@ -28,5 +28,17 @@ public interface FilmService {
 
     String deleteFilm(Integer id);
 
-    public void isExistsIdFilm(Integer filmId);
+    Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    Collection<Director> getAllDirectors();
+
+    Director getDirectorById(Integer id);
+
+    Director createDirector(Director director);
+
+    Director updateDirector(Director director);
+
+    String deleteDirector(Integer id);
+
+    void isExistsIdFilm(Integer filmId);
 }
