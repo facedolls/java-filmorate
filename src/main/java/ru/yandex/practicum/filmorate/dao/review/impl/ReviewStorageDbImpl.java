@@ -23,10 +23,10 @@ public class ReviewStorageDbImpl implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     protected final String sqlSelectOneReview = "SELECT * FROM review WHERE review_id = :reviewId";
-    protected final String sqlSelectAllReviews = "SELECT * FROM review";
-    protected final String sqlSelectReviewsByFilm = "SELECT * FROM review WHERE film_id = :filmId LIMIT :count";
-    protected final String sqlUpdateReview = "UPDATE review SET film_id = :filmId, " +
-            "user_id = :userId, is_positive = :isPositive, content = :content, useful = :useful " +
+    protected final String sqlSelectAllReviews = "SELECT * FROM review ORDER BY useful DESC";
+    protected final String sqlSelectReviewsByFilm = "SELECT * FROM review WHERE film_id = :filmId " +
+            "ORDER BY useful DESC LIMIT :count";
+    protected final String sqlUpdateReview = "UPDATE review SET is_positive = :isPositive, content = :content " +
             "WHERE review_id = :reviewId";
     protected final String sqlDeleteReview = "DELETE FROM review WHERE review_id = :reviewId";
     protected final String sqlSelectIdReview = "SELECT review_id FROM review WHERE review_id = :reviewId";
@@ -40,6 +40,7 @@ public class ReviewStorageDbImpl implements ReviewStorage {
             "user_id = :userId";
     protected final String sqlSelectDislike = "SELECT * FROM review_dislikes WHERE review_id = :reviewId AND " +
             "user_id = :userId";
+    protected final String sqlUpdateUseful = "UPDATE review SET useful = :useful WHERE review_id = :reviewId";
 
 
     @Override
@@ -84,21 +85,29 @@ public class ReviewStorageDbImpl implements ReviewStorage {
     @Override
     public void addLike(Long id, Long userId) {
         parameter.update(sqlInsertReviewLike, Map.of("reviewId", id, "userId", userId));
+        int updatedUseful = getReviewById(id).getUseful() + 1;
+        parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void addDislike(Long id, Long userId) {
         parameter.update(sqlInsertReviewDislike, Map.of("reviewId", id, "userId", userId));
+        int updatedUseful = getReviewById(id).getUseful() - 1;
+        parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void deleteLike(Long id, Long userId) {
         parameter.update(sqlDeleteReviewLike, Map.of("reviewId", id, "userId", userId));
+        int updatedUseful = getReviewById(id).getUseful() - 1;
+        parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void deleteDislike(Long id, Long userId) {
         parameter.update(sqlDeleteReviewDislike, Map.of("reviewId", id, "userId", userId));
+        int updatedUseful = getReviewById(id).getUseful() + 1;
+        parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override

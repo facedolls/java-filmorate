@@ -16,8 +16,7 @@ public class Review {
     private long filmId;
     @NotNull
     private long userId;
-    @NotNull
-    private boolean isPositive;
+    private Boolean isPositive;
     @NotBlank
     @Size(max = 5000)
     private String content;
@@ -44,7 +43,7 @@ public class Review {
         return this.userId;
     }
 
-    public @NotNull boolean getIsPositive() {
+    public Boolean getIsPositive() {
         return this.isPositive;
     }
 
@@ -68,7 +67,7 @@ public class Review {
         this.userId = userId;
     }
 
-    public void setIsPositive(@NotNull boolean isPositive) {
+    public void setIsPositive(boolean isPositive) {
         this.isPositive = isPositive;
     }
 

@@ -40,11 +40,14 @@ public class ReviewController {
             log.warn("Incorrect id={} was passed when creating the review: ", review.getReviewId());
             throw new ValidationException("id for the review must not be specified");
         }
+        reviewService.isReviewValid(review);
         return reviewService.createReview(review);
     }
 
     @PutMapping
     public Review updateReview(@Valid @RequestBody Review review) {
+        reviewService.isReviewExist(review.getReviewId());
+        reviewService.isReviewValid(review);
         return reviewService.updateReview(review);
     }
 
