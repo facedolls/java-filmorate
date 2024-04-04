@@ -125,35 +125,35 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT OUTER JOIN rating r ON f.rating_id = r.rating_id " +
             "WHERE f.name ILIKE '%'||:filmName||'%' ORDER BY count_likes DESC NULLS LAST";
 
-    protected final String sqlSelectFilmsByDirector = "SELECT f.*, r.name AS rating_name " +
-            "FROM film f " +
-            "LEFT OUTER JOIN (" +
-            "SELECT film_id, count(user_id) AS  count_likes " +
-            "    FROM favorite_film " +
-            "    GROUP BY film_id)ff ON f.film_id = ff.film_id " +
-            "LEFT OUTER JOIN rating r ON f.rating_id = r.rating_id " +
-            "WHERE f.film_id IN (SELECT film_id " +
-            "FROM  film_director " +
-            "WHERE director_id IN (SELECT director_id " +
-            "FROM director " +
-            "WHERE name ILIKE '%'||:directorName||'%')) " +
-            "ORDER BY count_likes DESC NULLS LAST";
+    protected final String sqlSelectFilmsByDirector = "WITH  cte AS ( " +
+            "SELECT  f.*, r.name as rating_name, count_likes " +
+            "FROM  film f " +
+            "LEFT  OUTER  JOIN  ( " +
+            "SELECT  film_id, count(user_id) as count_likes " +
+            "    FROM  favorite_film " +
+            "    GROUP  BY  film_id)ff ON  f.film_id = ff.film_id " +
+            "LEFT  OUTER  JOIN  rating r ON  f.rating_id = r.rating_id " +
+            "LEFT  OUTER  JOIN  film_director fd on f.film_id = fd.film_id " +
+            "LEFT  OUTER  JOIN  director d on fd.director_id = d.director_id " +
+            "WHERE  d.name ILIKE  '%'||:directorName||'%' " +
+            ") " +
+            "SELECT  DISTINCT  * FROM  cte " +
+            "ORDER  BY  count_likes DESC NULLS LAST";
 
-    protected final String sqlSelectFilmsByTitleAndDirector = "SELECT f.*, r.name AS rating_name " +
-            "FROM film f " +
-            "LEFT OUTER JOIN ( " +
-            "SELECT film_id, count(user_id) AS  count_likes " +
-            "    FROM favorite_film " +
-            "    GROUP BY film_id)ff ON f.film_id = ff.film_id " +
-            "LEFT OUTER JOIN rating r ON f.rating_id = r.rating_id " +
-            "WHERE f.film_id IN (SELECT film_id " +
-            "FROM  film_director " +
-            "WHERE director_id IN (SELECT director_id  " +
-            "FROM director " +
-            "WHERE name ILIKE '%'||:query||'%')) " +
-            "OR f.name ILIKE '%'||:query||'%' " +
-            "ORDER BY count_likes DESC NULLS LAST";
-
+    protected final String sqlSelectFilmsByTitleAndDirector = "WITH  cte AS ( " +
+            "SELECT  f.*, r.name as rating_name, count_likes " +
+            "FROM  film f " +
+            "LEFT  OUTER  JOIN  ( " +
+            "SELECT  film_id, count(user_id) as count_likes " +
+            "    FROM  favorite_film " +
+            "    GROUP  BY  film_id)ff ON  f.film_id = ff.film_id " +
+            "LEFT  OUTER  JOIN  rating r ON  f.rating_id = r.rating_id " +
+            "LEFT  OUTER  JOIN  film_director fd on f.film_id = fd.film_id " +
+            "LEFT  OUTER  JOIN  director d on fd.director_id = d.director_id " +
+            "WHERE  d.name ILIKE  '%'||:query||'%' OR f.name ILIKE '%'||:query||'%' " +
+            ") " +
+            "SELECT  DISTINCT  * FROM  cte " +
+            "ORDER  BY  count_likes DESC NULLS LAST";
 
     @Override
     public Film getFilmsById(Integer id) {
