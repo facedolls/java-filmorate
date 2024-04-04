@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
-
 import java.util.Collection;
 
 @Service
@@ -35,9 +34,9 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Collection<Film> getPopularFilm(Integer count) {
+    public Collection<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
         log.info("Received populars films");
-        return filmStorage.getPopularFilm(count);
+        return filmStorage.getPopularFilm(count, genreId, year);
     }
 
     @Override
@@ -121,7 +120,8 @@ public class FilmServiceImpl implements FilmService {
         return filmUpdated;
     }
 
-    private void isExistsIdFilm(Integer filmId) {
+    @Override
+    public void isExistsIdFilm(Integer filmId) {
         boolean isExists = filmStorage.isExistsIdFilm(filmId);
         if (!isExists) {
             log.warn("Film with id={} not found", filmId);

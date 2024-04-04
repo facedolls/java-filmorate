@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
 
@@ -40,6 +39,8 @@ public interface FilmService {
     Director updateDirector(Director director);
 
     String deleteDirector(Integer id);
+
+    void isExistsIdFilm(Integer filmId);
 
     Collection<Film> searchFilms(String query, String by);
 }

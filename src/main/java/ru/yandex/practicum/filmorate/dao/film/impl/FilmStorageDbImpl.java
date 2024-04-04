@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,6 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
             "ORDER BY g.genre_id";
-
     protected final String sqlSelectPopularsFilms = "SELECT f.*, r.name AS rating_name, " +
             "COUNT(l.user_id) AS count_likes " +
             "FROM film AS f " +
@@ -94,7 +92,6 @@ public class FilmStorageDbImpl implements FilmStorage {
     protected final String sqlUpdateDirector = "UPDATE director SET name = :name WHERE director_id = :directorId";
     protected final String sqlDeleteDirector = "DELETE FROM director WHERE director_id = :directorId";
     protected final String sqlDeleteDirectorsFilm = "DELETE FROM film_director WHERE film_id = :filmId";
-
     protected final String sqlSelectFilmsByDirectorAndLike = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "JOIN film_director AS fd ON f.film_id = fd.film_id " +
@@ -116,6 +113,115 @@ public class FilmStorageDbImpl implements FilmStorage {
             "JOIN film_director AS ff ON fg.film_id = ff.film_id " +
             "JOIN director AS d ON d.director_id = ff.director_id " +
             "WHERE d.director_id = :directorId";
+    protected final String sqlSelectTopFilmsByYear = "SELECT f.*, r.name AS rating_name, " +
+            "COUNT(l.user_id) AS count_likes " +
+            "FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "WHERE EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(l.user_id) DESC " +
+            "LIMIT :count";
+    protected final String sqlSelectGenresTopFilmsByYear = "SELECT f.*, g.name, COUNT(user_id) AS count_likes " +
+            "FROM film_genre AS f " +
+            "LEFT JOIN genre AS g ON f.genre_id = g.genre_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "WHERE EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.genre_id, g.name " +
+            "ORDER BY f.genre_id";
+    protected final String sqlSelectDirectorsTopFilmsByYear = "SELECT f.*, d.name, COUNT(user_id) AS count_likes " +
+            "FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "WHERE EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.director_id, d.name " +
+            "ORDER by f.director_id";
+    protected final String sqlSelectTopFilmsByYearAndGenre = "SELECT f.*, r.name AS rating_name, " +
+            "COUNT(l.user_id) AS count_likes " +
+            "FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "JOIN film_genre AS g ON f.film_id = g.film_id " +
+            "WHERE g.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(f.film_id) DESC " +
+            "LIMIT :count";
+    protected final String sqlSelectGenresTopFilmsByYearAndGenre = "SELECT f.*, g.name, COUNT(user_id) AS count_likes " +
+            "FROM film_genre AS f " +
+            "LEFT JOIN genre AS g ON f.genre_id = g.genre_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+            "WHERE fg.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.genre_id, g.name";
+    protected final String sqlSelectDirectorsTopFilmsByYearAndGenre = "SELECT f.*, d.name, " +
+            "COUNT(user_id) AS count_likes " +
+            "FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+            "WHERE fg.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.director_id, d.name";
+    protected final String sqlSelectTopFilmsByGenre = "SELECT f.*, r.name AS rating_name, " +
+            "COUNT(l.user_id) AS count_likes " +
+            "FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "JOIN film_genre AS g ON f.film_id = g.film_id " +
+            "WHERE g.genre_id = :genreId " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(f.film_id) DESC " +
+            "LIMIT :count";
+    protected final String sqlSelectGenresTopFilmsByGenre = "SELECT f.*, g.name, COUNT(user_id) AS count_likes " +
+            "FROM film_genre AS f " +
+            "LEFT JOIN genre AS g ON f.genre_id = g.genre_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
+            "JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+            "WHERE fg.genre_id = :genreId " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.genre_id, g.name";
+    protected final String sqlSelectDirectorsTopFilmsByGenre = "SELECT f.*, d.name, COUNT(user_id) AS count_likes " +
+            "FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT fm.film_id FROM film AS fm " +
+            "LEFT JOIN favorite_film AS ff ON ff.film_id = fm.film_id " +
+            "LEFT JOIN film_genre AS fg ON fg.film_id = fm.film_id " +
+            "WHERE fg.genre_id = :genreId " +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
+            "LIMIT :count) " +
+            "GROUP BY f.film_id, f.director_id, d.name " +
+            "ORDER BY f.director_id";
 
     protected final String sqlSelectFilmsByTitle = "SELECT f.*, r.name AS rating_name " +
             "FROM film f LEFT OUTER JOIN " +
@@ -168,7 +274,7 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     private List<Film> setFilmsWithGenresAndDirectors(List<Film> films, Map<String, Object> params,
-                                                      String sqlGenres, String sqlDirectors) {
+                                                         String sqlGenres, String sqlDirectors) {
         Map<Integer, List<Genre>> genres = parameter.query(sqlGenres, params, new GenreFromFilmMapper());
         films = setGenresFilms(films, genres);
 
@@ -216,13 +322,27 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getPopularFilm(Integer count) {
-        Map<String, Object> params = Map.of("count", count);
-        List<Film> films = parameter.query(sqlSelectPopularsFilms, params, new FilmMapper());
+    public Collection<Film> getPopularFilm(Integer count, Integer genreId, Integer year) {
+        if (genreId == 0 && year == 0) {
+            return sortTopFilmsByGenresOrYear(Map.of("count", count), sqlSelectPopularsFilms,
+                    sqlSelectPopularFilmsGenres, sqlSelectPopularFilmsDirectors);
+        } else if (genreId != 0 && year != 0) {
+            return sortTopFilmsByGenresOrYear(Map.of("count", count, "genreId", genreId,"year", year),
+                    sqlSelectTopFilmsByYearAndGenre, sqlSelectGenresTopFilmsByYearAndGenre,
+                    sqlSelectDirectorsTopFilmsByYearAndGenre);
+        } else if (genreId != 0) {
+            return sortTopFilmsByGenresOrYear(Map.of("count", count, "genreId", genreId),
+                    sqlSelectTopFilmsByGenre, sqlSelectGenresTopFilmsByGenre, sqlSelectDirectorsTopFilmsByGenre);
+        }
+        return sortTopFilmsByGenresOrYear(Map.of("count", count, "year", year), sqlSelectTopFilmsByYear,
+                sqlSelectGenresTopFilmsByYear, sqlSelectDirectorsTopFilmsByYear);
+    }
 
+    private Collection<Film> sortTopFilmsByGenresOrYear(Map<String, Object> params, String sqlFilms,
+                                                            String sqlGenres, String sqlDirectors) {
+        List<Film> films = parameter.query(sqlFilms, params, new FilmMapper());
         if (!films.isEmpty()) {
-            films = setFilmsWithGenresAndDirectors(films, params, sqlSelectPopularFilmsGenres,
-                    sqlSelectPopularFilmsDirectors);
+            return setFilmsWithGenresAndDirectors(films, params, sqlGenres, sqlDirectors);
         }
         return films;
     }
@@ -323,7 +443,7 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilmsByDirector(Integer directorId, String sortBy) { // TODO
+    public Collection<Film> getFilmsByDirector(Integer directorId, String sortBy) {
         Map<String, Object> params = Map.of("directorId", directorId);
         if (sortBy.equals("likes")) {
             return sortFilmsByDirectorAndArgument(params, sqlSelectFilmsByDirectorAndLike);
@@ -413,5 +533,4 @@ public class FilmStorageDbImpl implements FilmStorage {
         films = setDirectorsFilms(films, directors);
         return films;
     }
-
 }

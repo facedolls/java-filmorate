@@ -19,12 +19,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            log.warn("User with id={} not found", id);
-            throw new UserNotFoundException(String.format("User with id=%d not found", id));
-        }
-        return user;
+        isExistsIdUser(id);
+        log.info("Received user id={}", id);
+        return userStorage.getUserById(id);
     }
 
     @Override
@@ -40,14 +37,6 @@ public class UserServiceImpl implements UserService {
         return userStorage.getFriends(id);
     }
 
-    private void isExistsIdUser(Long userId) {
-        boolean isExists = userStorage.isExistsIdUser(userId);
-        if (!isExists) {
-            log.warn("User with id={} not found", userId);
-            throw new UserNotFoundException(String.format("User with id=%d not found", userId));
-        }
-    }
-
     @Override
     public Collection<User> getMutualFriends(Long id, Long otherId) {
         isExistsIdUser(id);
@@ -59,16 +48,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(User user) {
         setUserNameIfMissing(user);
-        User userCreated = userStorage.createUser(user);
-        log.info("Create user {}", userCreated);
-        return userCreated;
-    }
-
-    private void setUserNameIfMissing(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("The user's empty name {} has been changed to {}", user, user.getLogin());
-            user.setName(user.getLogin());
-        }
+        log.info("Create user {}", user);
+        return userStorage.createUser(user);
     }
 
     @Override
@@ -83,9 +64,8 @@ public class UserServiceImpl implements UserService {
     public User addInFriend(Long id, Long friendId) {
         isExistsIdUser(id);
         isExistsIdUser(friendId);
-        User user = userStorage.addInFriend(id, friendId);
         log.info("User id={} has been added as a friend to user id={} with status={}", friendId, id, true);
-        return user;
+        return userStorage.addInFriend(id, friendId);
     }
 
     @Override
@@ -108,5 +88,21 @@ public class UserServiceImpl implements UserService {
         userStorage.deleteUser(id);
         log.info("User with id={} deleted", id);
         return String.format("User with id=%d deleted", id);
+    }
+
+    @Override
+    public void isExistsIdUser(Long userId) {
+        boolean isExists = userStorage.isExistsIdUser(userId);
+        if (!isExists) {
+            log.warn("User with id={} not found", userId);
+            throw new UserNotFoundException(String.format("User with id=%d not found", userId));
+        }
+    }
+
+    private void setUserNameIfMissing(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.info("The user's empty name {} has been changed to {}", user, user.getLogin());
+            user.setName(user.getLogin());
+        }
     }
 }

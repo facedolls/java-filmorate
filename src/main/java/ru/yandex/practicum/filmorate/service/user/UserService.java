@@ -21,4 +21,6 @@ public interface UserService {
     String deleteFromFriends(Long id, Long friendId);
 
     String deleteUser(Long id);
+
+    void isExistsIdUser(Long userId);
 }
