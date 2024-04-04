@@ -30,6 +30,8 @@ public interface FilmStorage {
 
     boolean isExistsIdFilm(Integer filmId);
 
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
+
     Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
 
     Collection<Director> getAllDirectors();

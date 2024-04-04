@@ -222,6 +222,14 @@ public class FilmStorageDbImpl implements FilmStorage {
             "GROUP BY f.film_id, f.director_id, d.name " +
             "ORDER BY f.director_id";
 
+    protected final String sqlSelectCommonFilms = "SELECT f.*, r.name AS rating_name FROM film AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT film_id FROM favorite_film WHERE user_id = :userId " +
+            "INTERSECT SELECT film_id FROM favorite_film WHERE user_id = :friendId) " +
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY f.film_id";
+
     @Override
     public Film getFilmsById(Integer id) {
         Map<String, Object> params = Map.of("filmId", id);
@@ -406,6 +414,12 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Object> id = parameter.query(sqlSelectIdFilm, Map.of("filmId", filmId),
                 (rs, rowNum) -> rs.getInt("film_id"));
         return id.size() == 1;
+    }
+
+    @Override
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return parameter.query(sqlSelectCommonFilms, Map.of("userId", userId, "friendId", friendId),
+                new FilmMapper());
     }
 
     @Override
