@@ -39,4 +39,6 @@ public interface FilmService {
     Director updateDirector(Director director);
 
     String deleteDirector(Integer id);
+
+    void isExistsIdFilm(Integer filmId);
 }

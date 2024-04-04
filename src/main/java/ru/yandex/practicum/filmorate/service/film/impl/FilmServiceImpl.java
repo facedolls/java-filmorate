@@ -120,7 +120,8 @@ public class FilmServiceImpl implements FilmService {
         return filmUpdated;
     }
 
-    private void isExistsIdFilm(Integer filmId) {
+    @Override
+    public void isExistsIdFilm(Integer filmId) {
         boolean isExists = filmStorage.isExistsIdFilm(filmId);
         if (!isExists) {
             log.warn("Film with id={} not found", filmId);
