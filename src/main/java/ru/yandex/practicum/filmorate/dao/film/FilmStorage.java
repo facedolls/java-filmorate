@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao.film;
 
 import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
     Film getFilmsById(Integer id);
@@ -41,4 +42,10 @@ public interface FilmStorage {
     Director updateDirector(Director director);
 
     void deleteDirector(Integer directorId);
+
+    List<Film> searchFilmsByTitle(String query);
+
+    List<Film> searchFilmsByDirector(String query);
+
+    List<Film> searchFilmsByTitleAndDirector(String query);
 }
