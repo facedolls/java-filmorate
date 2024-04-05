@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+
 import java.util.Collection;
 
 @Service
@@ -16,6 +18,7 @@ import java.util.Collection;
 @Primary
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
+    private final UserService userService;
 
     @Override
     public Film getFilmById(Integer id) {
@@ -149,6 +152,14 @@ public class FilmServiceImpl implements FilmService {
         filmStorage.deleteFilm(id);
         log.info("Film with id={} deleted", id);
         return String.format("Film with id=%d deleted", id);
+    }
+
+    @Override
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        userService.isExistsIdUser(userId);
+        userService.isExistsIdUser(friendId);
+        log.info("Received common films between user id={} and user id={}", userId, friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     @Override
