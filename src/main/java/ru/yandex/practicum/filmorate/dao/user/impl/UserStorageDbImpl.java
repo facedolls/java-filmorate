@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.user.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -23,6 +24,7 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 @Primary
+@Slf4j
 public class UserStorageDbImpl implements UserStorage {
     protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId";
     protected final String sqlSelectAllUser = "SELECT * FROM users";
@@ -139,6 +141,8 @@ public class UserStorageDbImpl implements UserStorage {
         if (id == null) {
             throw new IncorrectParameterException("Null id ");
         }
+
+        log.info("Запрос к db по user: {} ", id);
 
         List<String> recommendationsFilmsId = jdbcTemplate.queryForList(
                 "SELECT DISTINCT film_id FROM favorite_film " +
