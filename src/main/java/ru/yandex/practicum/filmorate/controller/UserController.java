@@ -1,19 +1,21 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
-import java.util.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -79,5 +81,13 @@ public class UserController {
     @GetMapping("/{id}/feed")
     public List<FeedEvent> getFeedEventByUserId(@PathVariable Long id) {
         return userService.getFeedEventByUserId(id);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    @ResponseBody
+    public List<Film> getRecommendationsFilms(@PathVariable Long id) {
+        log.info("Получение списка рекомендаций по фильмам для пользователя ");
+
+        return userService.getRecommendationsFilms(id);
     }
 }

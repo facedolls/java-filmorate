@@ -1,16 +1,20 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import java.util.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,7 +48,7 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable @NotNull @Min(1) Integer directorId,
-                                                @RequestParam @NotBlank String sortBy) {
+                                               @RequestParam @NotBlank String sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
 

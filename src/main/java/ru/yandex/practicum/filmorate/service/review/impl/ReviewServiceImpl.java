@@ -42,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
             log.info("Received all reviews");
             return reviewStorage.getAllReviews();
         }
-        filmService.isExistsIdFilm(Long.valueOf(filmId).intValue());
+        filmService.isExistsIdFilm(filmId.intValue());
         log.info("Received {} reviews for the film id={}", count, filmId);
         return reviewStorage.getReviews(filmId, count);
     }

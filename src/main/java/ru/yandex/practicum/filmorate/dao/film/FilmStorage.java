@@ -1,6 +1,10 @@
 package ru.yandex.practicum.filmorate.dao.film;
 
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMpa;
+
 import java.util.Collection;
 import java.util.List;
 

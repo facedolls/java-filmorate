@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -35,44 +36,44 @@ public class Review {
         return this.reviewId;
     }
 
-    public @NotNull long getFilmId() {
-        return this.filmId;
-    }
-
-    public @NotNull long getUserId() {
-        return this.userId;
-    }
-
-    public Boolean getIsPositive() {
-        return this.isPositive;
-    }
-
-    public @NotBlank @Size(max = 5000) String getContent() {
-        return this.content;
-    }
-
-    public int getUseful() {
-        return this.useful;
-    }
-
     public void setReviewId(long reviewId) {
         this.reviewId = reviewId;
+    }
+
+    public @NotNull long getFilmId() {
+        return this.filmId;
     }
 
     public void setFilmId(@NotNull long filmId) {
         this.filmId = filmId;
     }
 
+    public @NotNull long getUserId() {
+        return this.userId;
+    }
+
     public void setUserId(@NotNull long userId) {
         this.userId = userId;
+    }
+
+    public Boolean getIsPositive() {
+        return this.isPositive;
     }
 
     public void setIsPositive(boolean isPositive) {
         this.isPositive = isPositive;
     }
 
+    public @NotBlank @Size(max = 5000) String getContent() {
+        return this.content;
+    }
+
     public void setContent(@NotBlank @Size(max = 5000) String content) {
         this.content = content;
+    }
+
+    public int getUseful() {
+        return this.useful;
     }
 
     public void setUseful(int useful) {
@@ -83,16 +84,15 @@ public class Review {
         if (o == this) return true;
         if (!(o instanceof Review)) return false;
         final Review other = (Review) o;
-        if (!other.canEqual((Object) this)) return false;
+        if (!other.canEqual(this)) return false;
         if (this.getReviewId() != other.getReviewId()) return false;
         if (this.getFilmId() != other.getFilmId()) return false;
         if (this.getUserId() != other.getUserId()) return false;
         if (this.getIsPositive() != other.getIsPositive()) return false;
         final Object this$content = this.getContent();
         final Object other$content = other.getContent();
-        if (this$content == null ? other$content != null : !this$content.equals(other$content)) return false;
-        if (this.getUseful() != other.getUseful()) return false;
-        return true;
+        if (!Objects.equals(this$content, other$content)) return false;
+        return this.getUseful() == other.getUseful();
     }
 
     protected boolean canEqual(final Object other) {

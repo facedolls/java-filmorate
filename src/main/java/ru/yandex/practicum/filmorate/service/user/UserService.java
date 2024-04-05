@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 
@@ -28,4 +29,6 @@ public interface UserService {
     void isExistsIdUser(Long userId);
 
     List<FeedEvent> getFeedEventByUserId(long userId);
+
+    List<Film> getRecommendationsFilms(Long id);
 }

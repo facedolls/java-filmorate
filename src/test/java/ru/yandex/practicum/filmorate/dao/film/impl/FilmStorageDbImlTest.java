@@ -1,19 +1,9 @@
 package ru.yandex.practicum.filmorate.dao.film.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDbImpl;
-import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
-import java.time.LocalDate;
-import java.util.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)

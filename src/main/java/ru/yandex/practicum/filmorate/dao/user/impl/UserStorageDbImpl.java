@@ -1,22 +1,28 @@
 package ru.yandex.practicum.filmorate.dao.user.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
+import ru.yandex.practicum.filmorate.mapper.RecommendationMapper;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+
 import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
 @Primary
+@Slf4j
 public class UserStorageDbImpl implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcOperations parameter;
     protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId";
     protected final String sqlSelectAllUser = "SELECT * FROM users";
     protected final String sqlSelectFriendsOneUser = "SELECT * FROM users " +
@@ -39,6 +45,8 @@ public class UserStorageDbImpl implements UserStorage {
     protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId";
     protected final String sqlSelectIdUserElseFriendship = "SELECT user_id FROM friendship " +
             "WHERE user_id = :userId AND friend_id = :friendId";
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcOperations parameter;
 
     @Override
     public User getUserById(Long id) {
@@ -117,10 +125,59 @@ public class UserStorageDbImpl implements UserStorage {
 
     @Override
     public boolean isExistsFriendship(Long userId, Long friendId) {
-       List<Integer> id = parameter.query(sqlSelectIdUserElseFriendship,
-               Map.of("userId", userId, "friendId", friendId),
-               (rs, rowNum) -> rs.getInt("user_id"));
+        List<Integer> id = parameter.query(sqlSelectIdUserElseFriendship,
+                Map.of("userId", userId, "friendId", friendId),
+                (rs, rowNum) -> rs.getInt("user_id"));
 
         return id.size() == 1;
+    }
+
+    @Override
+    public List<Film> getRecommendationsFilms(Long id) {
+
+        if (id == null) {
+            throw new IncorrectParameterException("Null id ");
+        }
+
+        log.info("Запрос к db по user: {} ", id);
+
+        List<Integer> recommendationsFilmsId = jdbcTemplate.queryForList(
+                "SELECT DISTINCT film_id FROM favorite_film " +
+                        "JOIN (SELECT second_user.user_id, " +
+                        "COUNT(second_user.film_id) AS count_films " +
+                        "FROM (SELECT * FROM favorite_film " +
+                        "WHERE user_id != ?) AS second_user " +
+                        "JOIN (SELECT * FROM favorite_film " +
+                        "WHERE user_id = ?) AS base_user " +
+                        "ON base_user.film_id = second_user.film_id " +
+                        "GROUP BY second_user.user_id " +
+                        "ORDER BY count_films DESC " +
+                        "LIMIT (SELECT CEILING(COUNT(user_id) * 0.1) " +
+                        "FROM favorite_film " +
+                        "WHERE film_id IN (SELECT film_id FROM favorite_film " +
+                        "WHERE user_id = ?))) AS user_top " +
+                        "ON favorite_film.user_id = user_top.user_id " +
+                        "WHERE favorite_film.film_id not IN (SELECT film_id FROM favorite_film " +
+                        "WHERE user_id = ?)", Integer.class, id, id, id, id);
+
+        if (recommendationsFilmsId.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String placeholders = String.join(",", Collections.nCopies(recommendationsFilmsId.size(), "?"));
+        String filmsRow = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, " +
+                "m.name AS rating_name, fd.director_id, " +
+                "di.name AS director_name, fg.genre_id, g.name AS genre_name " +
+                "FROM film AS f " +
+                "JOIN rating AS m ON f.rating_id = m.rating_id " +
+                "LEFT JOIN film_director AS fd ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS di ON fd.director_id = di.director_id " +
+                "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
+                "WHERE f.film_id IN (" + placeholders + ") " +
+                "ORDER BY fd.director_id, fg.genre_id";
+
+        Object[] idsArray = recommendationsFilmsId.toArray(new Object[0]);
+        return jdbcTemplate.query(filmsRow, new RecommendationMapper(), idsArray);
     }
 }
