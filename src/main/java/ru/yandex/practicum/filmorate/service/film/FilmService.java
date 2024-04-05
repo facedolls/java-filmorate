@@ -28,6 +28,8 @@ public interface FilmService {
 
     String deleteFilm(Integer id);
 
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
+
     Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
 
     Collection<Director> getAllDirectors();
