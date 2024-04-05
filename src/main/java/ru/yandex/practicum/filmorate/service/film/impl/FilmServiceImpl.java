@@ -209,4 +209,33 @@ public class FilmServiceImpl implements FilmService {
         log.info("Director with id={} deleted", directorId);
         return String.format("Director with id=%d deleted", directorId);
     }
+
+    @Override
+    public Collection<Film> searchFilms(String query, String by) {
+        if (by.indexOf(',') > 0) {
+            String[] findByArray = by.split(",");
+            if (findByArray.length > 2) {
+                log.warn("The number of parameters is incorrect {}", by);
+                throw new ValidationException("The number of parameters is incorrect!");
+            } else if (!(findByArray[0].equals("title") || findByArray[0].equals("director"))) {
+                log.warn("The first parameter {} is incorrect!", findByArray[0]);
+                throw new ValidationException("The first parameter " + findByArray[0] + " is incorrect!");
+            } else if (!(findByArray[1].equals("title") || findByArray[1].equals("director"))) {
+                log.warn("The second parameter {} is incorrect!", findByArray[1]);
+                throw new ValidationException("The second parameter " + findByArray[1] + " is incorrect!");
+            } else {
+                return filmStorage.searchFilmsByTitleAndDirector(query);
+            }
+        } else {
+            if (by.equals("title")) {
+                return filmStorage.searchFilmsByTitle(query);
+            } else if (by.equals("director")) {
+                return filmStorage.searchFilmsByDirector(query);
+            } else {
+                System.out.println("Параметр поиска не определен!");
+                log.warn("The parameter {} is incorrect", by);
+                throw new ValidationException("The parameter " + by + " is incorrect");
+            }
+        }
+    }
 }

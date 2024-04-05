@@ -43,4 +43,6 @@ public interface FilmService {
     String deleteDirector(Integer id);
 
     void isExistsIdFilm(Integer filmId);
+
+    Collection<Film> searchFilms(String query, String by);
 }

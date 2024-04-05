@@ -30,6 +30,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "GROUP BY film_id, rating_name " +
             "ORDER BY film_id";
+
     protected final String sqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
@@ -230,6 +231,44 @@ public class FilmStorageDbImpl implements FilmStorage {
             "GROUP BY f.film_id, rating_name " +
             "ORDER BY f.film_id";
 
+    protected final String sqlSelectFilmsByTitle = "SELECT f.*, r.name AS rating_name " +
+            "FROM film f LEFT OUTER JOIN " +
+            "(SELECT film_id, count(user_id) AS count_likes " +
+            "FROM favorite_film " +
+            "GROUP BY film_id) ff ON f.film_id = ff.film_id " +
+            "LEFT OUTER JOIN rating r ON f.rating_id = r.rating_id " +
+            "WHERE f.name ILIKE '%'||:filmName||'%' ORDER BY count_likes DESC NULLS LAST";
+
+    protected final String sqlSelectFilmsByDirector = "WITH  cte AS ( " +
+            "SELECT  f.*, r.name as rating_name, count_likes " +
+            "FROM  film f " +
+            "LEFT  OUTER  JOIN  ( " +
+            "SELECT  film_id, count(user_id) as count_likes " +
+            "    FROM  favorite_film " +
+            "    GROUP  BY  film_id)ff ON  f.film_id = ff.film_id " +
+            "LEFT  OUTER  JOIN  rating r ON  f.rating_id = r.rating_id " +
+            "LEFT  OUTER  JOIN  film_director fd on f.film_id = fd.film_id " +
+            "LEFT  OUTER  JOIN  director d on fd.director_id = d.director_id " +
+            "WHERE  d.name ILIKE  '%'||:directorName||'%' " +
+            ") " +
+            "SELECT  DISTINCT  * FROM  cte " +
+            "ORDER  BY  count_likes DESC NULLS LAST";
+
+    protected final String sqlSelectFilmsByTitleAndDirector = "WITH  cte AS ( " +
+            "SELECT  f.*, r.name as rating_name, count_likes " +
+            "FROM  film f " +
+            "LEFT  OUTER  JOIN  ( " +
+            "SELECT  film_id, count(user_id) as count_likes " +
+            "    FROM  favorite_film " +
+            "    GROUP  BY  film_id)ff ON  f.film_id = ff.film_id " +
+            "LEFT  OUTER  JOIN  rating r ON  f.rating_id = r.rating_id " +
+            "LEFT  OUTER  JOIN  film_director fd on f.film_id = fd.film_id " +
+            "LEFT  OUTER  JOIN  director d on fd.director_id = d.director_id " +
+            "WHERE  d.name ILIKE  '%'||:query||'%' OR f.name ILIKE '%'||:query||'%' " +
+            ") " +
+            "SELECT  DISTINCT  * FROM  cte " +
+            "ORDER  BY  count_likes DESC NULLS LAST";
+
     @Override
     public Film getFilmsById(Integer id) {
         Map<String, Object> params = Map.of("filmId", id);
@@ -257,12 +296,7 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Film> films = parameter.query(sqlSelectAllFilms, new FilmMapper());
 
         if (!films.isEmpty()) {
-            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
-            films = setGenresFilms(films, genres);
-
-            Map<Integer, List<Director>> directors = parameter.query(sqlSelectDirectorsAllFilms,
-                    new DirectorFromFilmMapper());
-            films = setDirectorsFilms(films, directors);
+            films = joinGenresAndDirectorToFilm(films);
         }
         return films;
     }
@@ -472,5 +506,45 @@ public class FilmStorageDbImpl implements FilmStorage {
     @Override
     public void deleteDirector(Integer id) {
         parameter.update(sqlDeleteDirector, Map.of("directorId", id));
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitle(String query) {
+        Map<String, Object> params = Map.of("filmName", query);
+        List<Film> films = parameter.query(sqlSelectFilmsByTitle, params, new FilmMapper());
+        if (!films.isEmpty()) {
+            films = joinGenresAndDirectorToFilm(films);
+        }
+        return films;
+    }
+
+    @Override
+    public List<Film> searchFilmsByDirector(String query) {
+        Map<String, Object> params = Map.of("directorName", query);
+        List<Film> films = parameter.query(sqlSelectFilmsByDirector, params, new FilmMapper());
+        if (!films.isEmpty()) {
+            films = joinGenresAndDirectorToFilm(films);
+        }
+        return films;
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitleAndDirector(String query) {
+        Map<String, Object> params = Map.of("query", query);
+        List<Film> films = parameter.query(sqlSelectFilmsByTitleAndDirector, params, new FilmMapper());
+        if (!films.isEmpty()) {
+            films = joinGenresAndDirectorToFilm(films);
+        }
+        return films;
+    }
+
+    public List<Film> joinGenresAndDirectorToFilm(List<Film> films) {
+        Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
+        films = setGenresFilms(films, genres);
+
+        Map<Integer, List<Director>> directors = parameter.query(sqlSelectDirectorsAllFilms,
+                new DirectorFromFilmMapper());
+        films = setDirectorsFilms(films, directors);
+        return films;
     }
 }
