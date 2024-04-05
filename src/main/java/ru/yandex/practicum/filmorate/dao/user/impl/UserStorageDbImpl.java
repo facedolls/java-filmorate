@@ -16,10 +16,7 @@ import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -144,7 +141,7 @@ public class UserStorageDbImpl implements UserStorage {
 
         log.info("Запрос к db по user: {} ", id);
 
-        List<String> recommendationsFilmsId = jdbcTemplate.queryForList(
+        List<Integer> recommendationsFilmsId = jdbcTemplate.queryForList(
                 "SELECT DISTINCT film_id FROM favorite_film " +
                         "JOIN (SELECT second_user.user_id, " +
                         "COUNT(second_user.film_id) AS count_films " +
@@ -161,12 +158,13 @@ public class UserStorageDbImpl implements UserStorage {
                         "WHERE user_id = ?))) AS user_top " +
                         "ON favorite_film.user_id = user_top.user_id " +
                         "WHERE favorite_film.film_id not IN (SELECT film_id FROM favorite_film " +
-                        "WHERE user_id = ?)", String.class, id, id, id, id);
+                        "WHERE user_id = ?)", Integer.class, id, id, id, id);
 
         if (recommendationsFilmsId.isEmpty()) {
             return new ArrayList<>();
         }
 
+        String placeholders = String.join(",", Collections.nCopies(recommendationsFilmsId.size(), "?"));
         String filmsRow = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id, " +
                 "m.name AS rating_name, fd.director_id, " +
                 "di.name AS director_name, fg.genre_id, g.name AS genre_name " +
@@ -176,8 +174,10 @@ public class UserStorageDbImpl implements UserStorage {
                 "LEFT JOIN director AS di ON fd.director_id = di.director_id " +
                 "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
-                "WHERE f.film_id IN (?) " +
+                "WHERE f.film_id IN (" + placeholders + ") " +
                 "ORDER BY fd.director_id, fg.genre_id";
-        return jdbcTemplate.query(filmsRow, new RecommendationMapper(), String.join(",", recommendationsFilmsId));
+
+        Object[] idsArray = recommendationsFilmsId.toArray(new Object[0]);
+        return jdbcTemplate.query(filmsRow, new RecommendationMapper(), idsArray);
     }
 }
