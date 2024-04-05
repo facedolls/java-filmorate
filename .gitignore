@@ -43,4 +43,4 @@ build/
 .vscode/
 
 *.db
-db/*
+db/*.DS_Store
