@@ -10,6 +10,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
+import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.review.ReviewService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -24,9 +27,10 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmService filmService;
     private final UserService userService;
+    private final FeedEventService feedEventService;
 
     @Override
-    public Review getReviewById(Long id){
+    public Review getReviewById(Long id) {
         isReviewExist(id);
         log.info("Received review id={}", id);
         return reviewStorage.getReviewById(id);
@@ -48,6 +52,8 @@ public class ReviewServiceImpl implements ReviewService {
         userService.isExistsIdUser(review.getUserId());
         filmService.isExistsIdFilm(Long.valueOf(review.getFilmId()).intValue());
         Review createdReview = reviewStorage.createReview(review);
+        feedEventService.addFeedEvent(createdReview.getUserId(), EventType.REVIEW, EventOperation.ADD,
+                createdReview.getReviewId());
         log.info("Create review {}", createdReview);
         return createdReview;
     }
@@ -57,6 +63,8 @@ public class ReviewServiceImpl implements ReviewService {
         userService.isExistsIdUser(review.getUserId());
         filmService.isExistsIdFilm(Long.valueOf(review.getFilmId()).intValue());
         Review updatedReview = reviewStorage.updateReview(review);
+        feedEventService.addFeedEvent(updatedReview.getUserId(), EventType.REVIEW, EventOperation.UPDATE,
+                updatedReview.getReviewId());
         log.info("Update review {}", review);
         return updatedReview;
     }
@@ -126,7 +134,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public String deleteReview(Long id) {
         isReviewExist(id);
+        Review review = getReviewById(id);
         reviewStorage.deleteReview(id);
+        feedEventService.addFeedEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE,
+                review.getReviewId());
         log.info("Review with id={} deleted", id);
         return String.format("Review with id=%d deleted", id);
     }

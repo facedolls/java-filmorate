@@ -6,8 +6,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
+import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+
 import java.util.Collection;
 
 @Service
@@ -16,6 +20,7 @@ import java.util.Collection;
 @Primary
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
+    private final FeedEventService feedEventService;
 
     @Override
     public Film getFilmById(Integer id) {
@@ -132,6 +137,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film putLike(Integer id, Long userId) {
         isExistsIdFilm(id);
+        feedEventService.addFeedEvent(userId, EventType.LIKE, EventOperation.ADD, id);
         log.info("User userId={} liked the film id={}", userId, id);
         return filmStorage.putLike(id, userId);
     }
@@ -139,6 +145,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film deleteLike(Integer id, Long userId) {
         isExistsIdFilm(id);
+        feedEventService.addFeedEvent(userId, EventType.LIKE, EventOperation.REMOVE, id);
         log.info("User id={} removed the like from the film id={}", userId, id);
         return filmStorage.deleteLike(id, userId);
     }

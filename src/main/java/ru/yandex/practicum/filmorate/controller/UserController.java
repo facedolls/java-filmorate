@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -9,7 +10,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 import ru.yandex.practicum.filmorate.service.user.UserService;
+
 import java.util.*;
 
 @RestController
@@ -58,7 +61,7 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public User addInFriend(@PathVariable @NotNull @Min(1) Long id,
-                              @PathVariable @NotNull @Min(1) Long friendId) {
+                            @PathVariable @NotNull @Min(1) Long friendId) {
         return userService.addInFriend(id, friendId);
     }
 
@@ -71,5 +74,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable @NotNull @Min(1) Long id) {
         return userService.deleteUser(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<FeedEvent> getFeedEventByUserId(@PathVariable Long id) {
+        return userService.getFeedEventByUserId(id);
     }
 }
