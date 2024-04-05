@@ -1,11 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,7 +11,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
-import java.util.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")

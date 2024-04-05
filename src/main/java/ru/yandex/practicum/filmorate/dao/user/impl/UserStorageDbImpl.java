@@ -3,23 +3,27 @@ package ru.yandex.practicum.filmorate.dao.user.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.mapper.RecommendationMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 @Primary
 public class UserStorageDbImpl implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcOperations parameter;
     protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId";
     protected final String sqlSelectAllUser = "SELECT * FROM users";
     protected final String sqlSelectFriendsOneUser = "SELECT * FROM users " +
@@ -42,6 +46,8 @@ public class UserStorageDbImpl implements UserStorage {
     protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId";
     protected final String sqlSelectIdUserElseFriendship = "SELECT user_id FROM friendship " +
             "WHERE user_id = :userId AND friend_id = :friendId";
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcOperations parameter;
 
     @Override
     public User getUserById(Long id) {
@@ -120,9 +126,9 @@ public class UserStorageDbImpl implements UserStorage {
 
     @Override
     public boolean isExistsFriendship(Long userId, Long friendId) {
-       List<Integer> id = parameter.query(sqlSelectIdUserElseFriendship,
-               Map.of("userId", userId, "friendId", friendId),
-               (rs, rowNum) -> rs.getInt("user_id"));
+        List<Integer> id = parameter.query(sqlSelectIdUserElseFriendship,
+                Map.of("userId", userId, "friendId", friendId),
+                (rs, rowNum) -> rs.getInt("user_id"));
 
         return id.size() == 1;
     }

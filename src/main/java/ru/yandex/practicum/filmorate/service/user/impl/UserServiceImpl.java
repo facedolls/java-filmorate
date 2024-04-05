@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.*;
+import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
@@ -12,7 +13,6 @@ import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;

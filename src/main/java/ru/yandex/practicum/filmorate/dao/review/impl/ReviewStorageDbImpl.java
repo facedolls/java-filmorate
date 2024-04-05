@@ -20,8 +20,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Primary
 public class ReviewStorageDbImpl implements ReviewStorage {
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcOperations parameter;
     protected final String sqlSelectOneReview = "SELECT * FROM review WHERE review_id = :reviewId";
     protected final String sqlSelectAllReviews = "SELECT * FROM review ORDER BY useful DESC";
     protected final String sqlSelectReviewsByFilm = "SELECT * FROM review WHERE film_id = :filmId " +
@@ -41,7 +39,8 @@ public class ReviewStorageDbImpl implements ReviewStorage {
     protected final String sqlSelectDislike = "SELECT * FROM review_dislikes WHERE review_id = :reviewId AND " +
             "user_id = :userId";
     protected final String sqlUpdateUseful = "UPDATE review SET useful = :useful WHERE review_id = :reviewId";
-
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcOperations parameter;
 
     @Override
     public Review getReviewById(Long id) {
