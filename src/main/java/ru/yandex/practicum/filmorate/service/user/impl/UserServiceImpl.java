@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
@@ -112,6 +113,11 @@ public class UserServiceImpl implements UserService {
     public List<FeedEvent> getFeedEventByUserId(long userId) {
         getUserById(userId);
         return feedEventService.getFeedEventByUserId(userId);
+    }
+
+    @Override
+    public List<Film> getRecommendationsFilms(Long id) {
+        return userStorage.getRecommendationsFilms(id);
     }
 
     private void setUserNameIfMissing(User user) {
