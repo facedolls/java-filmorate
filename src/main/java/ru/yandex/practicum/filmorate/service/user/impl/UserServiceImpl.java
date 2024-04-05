@@ -6,9 +6,15 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
+import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
+import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
+
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +22,7 @@ import java.util.Collection;
 @Primary
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
+    private final FeedEventService feedEventService;
 
     @Override
     public User getUserById(Long id) {
@@ -64,6 +71,7 @@ public class UserServiceImpl implements UserService {
     public User addInFriend(Long id, Long friendId) {
         isExistsIdUser(id);
         isExistsIdUser(friendId);
+        feedEventService.addFeedEvent(id, EventType.FRIEND, EventOperation.ADD, friendId);
         log.info("User id={} has been added as a friend to user id={} with status={}", friendId, id, true);
         return userStorage.addInFriend(id, friendId);
     }
@@ -78,6 +86,7 @@ public class UserServiceImpl implements UserService {
             return String.format("Friendship user id=%d with user id=%d not found", friendId, id);
         }
         userStorage.deleteFromFriends(id, friendId);
+        feedEventService.addFeedEvent(id, EventType.FRIEND, EventOperation.REMOVE, friendId);
         log.info("User id={} has been removed from friends of user id={}", friendId, id);
         return String.format("User id=%d has been removed from friends of user id=%d", friendId, id);
     }
@@ -97,6 +106,12 @@ public class UserServiceImpl implements UserService {
             log.warn("User with id={} not found", userId);
             throw new UserNotFoundException(String.format("User with id=%d not found", userId));
         }
+    }
+
+    @Override
+    public List<FeedEvent> getFeedEventByUserId(long userId) {
+        getUserById(userId);
+        return feedEventService.getFeedEventByUserId(userId);
     }
 
     private void setUserNameIfMissing(User user) {
