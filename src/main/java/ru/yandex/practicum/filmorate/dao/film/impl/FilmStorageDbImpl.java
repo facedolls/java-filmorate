@@ -428,6 +428,7 @@ public class FilmStorageDbImpl implements FilmStorage {
 
     @Override
     public Film putLike(Integer id, Long userId) {
+        parameter.update(sqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
         parameter.update(sqlInsertLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }

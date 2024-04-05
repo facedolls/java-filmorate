@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS favorite_film
 (
     film_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    -- PRIMARY KEY (film_id, user_id),
+    PRIMARY KEY (film_id, user_id),
     FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
