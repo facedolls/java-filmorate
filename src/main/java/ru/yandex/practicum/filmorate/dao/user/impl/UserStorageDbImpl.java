@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.mapper.RecommendationMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.util.*;
 
 @Repository
@@ -23,28 +22,27 @@ import java.util.*;
 @Primary
 @Slf4j
 public class UserStorageDbImpl implements UserStorage {
-    protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId";
-    protected final String sqlSelectAllUser = "SELECT * FROM users";
-    protected final String sqlSelectFriendsOneUser = "SELECT * FROM users " +
-            "WHERE user_id IN " +
-            "(SELECT friend_id FROM friendship " +
-            "WHERE user_id = :userId)";
-    protected final String sqlSelectMutualFriends = "SELECT * FROM users " +
-            "WHERE user_id IN " +
-            "(SELECT friend_id FROM friendship " +
+    protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId;";
+    protected final String sqlSelectAllUser = "SELECT * FROM users;";
+    protected final String sqlSelectFriendsOneUser = "SELECT u.* FROM users AS u " +
+            "JOIN friendship AS f ON u.user_id = f.friend_id " +
+            "WHERE f.user_id = :userId;";
+    protected final String sqlSelectMutualFriends = "SELECT u.* FROM users AS u " +
+            "JOIN (SELECT friend_id " +
+            "FROM friendship " +
             "WHERE user_id = :userId OR user_id = :otherId " +
             "GROUP BY friend_id " +
-            "HAVING COUNT(friend_id) > 1)";
-    protected final String sqlInsertInFriends = "INSERT INTO friendship VALUES (:userId, :friendId, true)";
+            "HAVING COUNT(*) > 1) AS common_friends ON u.user_id = common_friends.friend_id;";
+    protected final String sqlInsertInFriends = "INSERT INTO friendship VALUES (:userId, :friendId, true);";
     protected final String sqlUpdateUser = "UPDATE users SET email = :email, " +
             "login = :login, name = :name,  birthday = :birthday " +
-            "WHERE user_id = :userId";
-    protected final String sqlDeleteUser = "DELETE FROM users WHERE user_id = :userId";
+            "WHERE user_id = :userId;";
+    protected final String sqlDeleteUser = "DELETE FROM users WHERE user_id = :userId;";
     protected final String sqlDeleteFromFriends = "DELETE FROM friendship " +
-            "WHERE user_id = :userId AND friend_id = :friendId";
-    protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId";
+            "WHERE user_id = :userId AND friend_id = :friendId;";
+    protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId;";
     protected final String sqlSelectIdUserElseFriendship = "SELECT user_id FROM friendship " +
-            "WHERE user_id = :userId AND friend_id = :friendId";
+            "WHERE user_id = :userId AND friend_id = :friendId;";
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
 
@@ -97,11 +95,6 @@ public class UserStorageDbImpl implements UserStorage {
     public User updateUser(User user) {
         parameter.update(sqlUpdateUser, getUserParams(user));
         return getUserById(user.getId());
-    }
-
-    private Map<String, Object> getUserParams(User user) {
-        return Map.of("email", user.getEmail(), "login", user.getLogin(), "name", user.getName(),
-                "birthday", user.getBirthday(), "userId", user.getId());
     }
 
     @Override
@@ -158,7 +151,7 @@ public class UserStorageDbImpl implements UserStorage {
                         "WHERE user_id = ?))) AS user_top " +
                         "ON favorite_film.user_id = user_top.user_id " +
                         "WHERE favorite_film.film_id not IN (SELECT film_id FROM favorite_film " +
-                        "WHERE user_id = ?)", Integer.class, id, id, id, id);
+                        "WHERE user_id = ?);", Integer.class, id, id, id, id);
 
         if (recommendationsFilmsId.isEmpty()) {
             return new ArrayList<>();
@@ -175,9 +168,14 @@ public class UserStorageDbImpl implements UserStorage {
                 "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
                 "WHERE f.film_id IN (" + placeholders + ") " +
-                "ORDER BY fd.director_id, fg.genre_id";
+                "ORDER BY fd.director_id, fg.genre_id;";
 
         Object[] idsArray = recommendationsFilmsId.toArray(new Object[0]);
         return jdbcTemplate.query(filmsRow, new RecommendationMapper(), idsArray);
+    }
+
+    private Map<String, Object> getUserParams(User user) {
+        return Map.of("email", user.getEmail(), "login", user.getLogin(), "name", user.getName(),
+                "birthday", user.getBirthday(), "userId", user.getId());
     }
 }

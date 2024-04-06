@@ -11,11 +11,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
