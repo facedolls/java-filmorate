@@ -1,21 +1,34 @@
 package ru.yandex.practicum.filmorate.service.film.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exception.*;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmServiceImplTest {
-    /*private FilmService filmService;
+    private FilmService filmService;
+    private FeedEventService feedEventService;
+    private UserService userService;
     private final FilmStorage filmStorage;
     private Film film1;
 
     @BeforeEach
     public void setUp() {
-        filmService = new FilmServiceImpl(filmStorage);
+        filmService = new FilmServiceImpl(filmStorage, feedEventService, userService);
         film1 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
-                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
     }
 
     @DisplayName("Должен выдать исключение FilmNotFoundException и не найти id фильма")
@@ -53,7 +66,7 @@ public class FilmServiceImplTest {
     public void shouldNotUpdateFilmDueToNonExistentId() {
         Film film = new Film(60,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
-                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 
         FilmNotFoundException exception = assertThrows(
                 FilmNotFoundException.class,
@@ -68,12 +81,12 @@ public class FilmServiceImplTest {
         filmService.createFilm(film1);
         Film film = new Film(1,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
-                new RatingMpa(1000, "GKLJH"), List.of(new Genre(1, "Комедия")));
+                new RatingMpa(1000, "GKLJH"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 
         ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> filmService.updateFilm(film)
         );
         assertEquals("Rating MPA with id=1000 not already exist", exception.getMessage());
-    }*/
+    }
 }
