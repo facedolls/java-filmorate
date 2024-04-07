@@ -19,6 +19,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,5 +98,53 @@ public class FilmServiceImplTest {
                 () -> filmService.updateFilm(film)
         );
         assertEquals("Rating MPA with id=1000 not already exist", exception.getMessage());
+    }
+
+    @DisplayName("Не должен найти фильм и должен выдать исключение ValidationException")
+    @Test
+    public void shouldNotFindFilmWithIncorrectNumberOfParameters() {
+        filmService.createFilm(film1);
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> filmService.searchFilms("555", "title,director,somethingElse")
+        );
+        assertEquals("The number of parameters is incorrect!", exception.getMessage());
+    }
+
+    @DisplayName("Не должен найти фильм и должен выдать исключение ValidationException")
+    @Test
+    public void shouldNotFindFilmWithIncorrectFirstParameter() {
+        filmService.createFilm(film1);
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> filmService.searchFilms("555", "wrongTitle,director")
+        );
+        assertEquals("The first parameter wrongTitle is incorrect!", exception.getMessage());
+    }
+
+    @DisplayName("Не должен найти фильм и должен выдать исключение ValidationException")
+    @Test
+    public void shouldNotFindFilmWithIncorrectSecondParameter() {
+        filmService.createFilm(film1);
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> filmService.searchFilms("555", "title,wrongDirector")
+        );
+        assertEquals("The second parameter wrongDirector is incorrect!", exception.getMessage());
+    }
+
+    @DisplayName("Не должен найти фильм и должен выдать исключение ValidationException")
+    @Test
+    public void shouldNotFindFilmWithIncorrectParameter() {
+        filmService.createFilm(film1);
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> filmService.searchFilms("555", "wrongTitle")
+        );
+        assertEquals("The parameter wrongTitle is incorrect", exception.getMessage());
     }
 }
