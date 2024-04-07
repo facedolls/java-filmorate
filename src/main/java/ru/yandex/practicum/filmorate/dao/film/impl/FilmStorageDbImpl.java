@@ -109,9 +109,12 @@ public class FilmStorageDbImpl implements FilmStorage {
             "WHERE director_id = :directorId " +
             "GROUP BY f.film_id, rating_name " +
             "ORDER BY release_date;";
-    protected final String sqlSelectFilmsByDirectorDirectors = "SELECT f.*, d.name FROM film_director AS f " +
-            "JOIN director AS d ON f.director_id = d.director_id " +
-            "WHERE d.director_id = :directorId;";
+    protected final String sqlSelectFilmsByDirectorDirectors = "SELECT ff.*, dd.name FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "JOIN film_director AS ff ON f.film_id = ff.film_id " +
+            "LEFT JOIN director AS dd ON ff.director_id = dd.director_id " +
+            "WHERE d.director_id = :directorId " +
+            "ORDER BY ff.film_id, dd.director_id;";
     protected final String sqlSelectFilmsByDirectorGenres = "SELECT fg.*, g.name FROM film_genre AS fg " +
             "JOIN genre AS g ON fg.genre_id = g.genre_id " +
             "JOIN film_director AS ff ON fg.film_id = ff.film_id " +

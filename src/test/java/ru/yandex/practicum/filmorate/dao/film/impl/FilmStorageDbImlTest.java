@@ -278,4 +278,471 @@ public class FilmStorageDbImlTest {
                 .isEqualTo(false);
 
     }
+
+    @DisplayName("Должен вернуть всех режиссеров фильмов")
+    @Test
+    public void shouldReturnAllDirectors() {
+        List<Director> director = List.of(new Director(1, "Director1"), new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(1, "Director1"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+
+        Collection<Director> result = filmStorage.getAllDirectors();
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director);
+    }
+
+    @DisplayName("Должен вернуть режиссера фильмов по id")
+    @Test
+    public void shouldReturnDirectorById() {
+        Director director = new Director(2, "Director2");
+        filmStorage.createDirector(new Director(1, "Director1"));
+        filmStorage.createDirector(director);
+
+        Director result = filmStorage.getDirectorById(2);
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director);
+    }
+
+    @DisplayName("Должен создать режиссера фильмов, игнорируя старый id и присвоив новый правильный id")
+    @Test
+    public void shouldCreateDirector() {
+        Director director = new Director(2, "Director2");
+        filmStorage.createDirector(new Director(365, "Director1"));
+        filmStorage.createDirector(new Director(785, "Director2"));
+
+        Director result = filmStorage.getDirectorById(2);
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director);
+    }
+
+    @DisplayName("Должен обновить режиссера фильмов")
+    @Test
+    public void shouldUpdateDirector() {
+        Director director1 = new Director(2, "Director2");
+        filmStorage.createDirector(new Director(1, "Director1"));
+        filmStorage.createDirector(director1);
+
+        Director result1 = filmStorage.getDirectorById(2);
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director1);
+
+        Director director2 = new Director(2, "Director2 super");
+        filmStorage.updateDirector(director2);
+
+        Director result2 = filmStorage.getDirectorById(2);
+        assertThat(result2)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director2);
+    }
+
+    @DisplayName("Должен удалить режиссера фильмов")
+    @Test
+    public void shouldDeleteDirector() {
+        List<Director> director1 = List.of(new Director(1, "Director1"), new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(1, "Director1"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+
+        Collection<Director> result1 = filmStorage.getAllDirectors();
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director1);
+
+        List<Director> director2 = List.of(new Director(2, "Director2"));
+        filmStorage.deleteDirector(1);
+
+        Collection<Director> result2 = filmStorage.getAllDirectors();
+        assertThat(result2)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(director2);
+    }
+
+    @DisplayName("Должен создать фильм с режиссером")
+    @Test
+    public void shouldCreateFilmWithDirector() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+
+        Film result1 = filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, null))));
+
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(film1);
+    }
+
+    @DisplayName("Должен обновить фильм с режиссером")
+    @Test
+    public void shouldUpdateFilmWithDirector() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2 super"));
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+
+        Film result1 = filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, null))));
+
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(film1);
+
+        Film film2 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(2, "Director2 super")));
+
+        Film result2 = filmStorage.updateFilm(new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(2, null))));
+
+        assertThat(result2)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(film2);
+    }
+
+    @DisplayName("Должен удалить режиссера у фильмов после удаления режиссера из базы данных")
+    @Test
+    public void shouldRemoveDirectorFromFilms() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+
+        Film result1 = filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, null))));
+
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(film1);
+
+        Film result2 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                new ArrayList<>());
+
+        filmStorage.deleteDirector(1);
+        Film film2 = filmStorage.getFilmsById(1);
+
+        assertThat(result2)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(film2);
+    }
+
+    @DisplayName("Должен вернуть список фильмов по id режиссера и годам")
+    @Test
+    public void shouldReturnFilmsByDirectorAndYear() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(3, "Director3"));
+
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2")));
+        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
+                List.of(new Director(1, "Director")));
+
+        List<Film> listFilmsByDirectorAndYear = List.of(film1, film2, film3);
+
+        filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"))));
+        filmStorage.createFilm(new Film("Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2"))));
+        filmStorage.createFilm(new Film("Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
+                List.of(new Director(1, "Director"))));
+
+        Collection<Film> films = filmStorage.getFilmsByDirector(1, "year");
+        assertThat(films)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByDirectorAndYear);
+    }
+
+    @DisplayName("Должен вернуть список фильмов по id режиссера и лайкам")
+    @Test
+    public void shouldReturnFilmsByDirectorAndLikes() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(3, "Director3"));
+
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2")));
+        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
+                List.of(new Director(1, "Director")));
+
+        List<Film> listFilmsByDirectorAndLikes = List.of(film2, film3, film1);
+
+        filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"))));
+        filmStorage.createFilm(new Film("Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2"))));
+        filmStorage.createFilm(new Film("Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
+                List.of(new Director(1, "Director"))));
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
+
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 2L);
+        filmStorage.putLike(2, 3L);
+        filmStorage.putLike(3, 1L);
+        filmStorage.putLike(3, 2L);
+
+        Collection<Film> films = filmStorage.getFilmsByDirector(1, "likes");
+        assertThat(films)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByDirectorAndLikes);
+    }
+
+    @DisplayName("Должен вернуть популярные фильмы по id жанра")
+    @Test
+    void shouldReturnPopularFilmsByGenre() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(3, "Director3"));
+
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2")));
+        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director")));
+        List<Film> listFilmsByGenre1 = List.of(film2, film1);
+        List<Film> listFilmsByGenre2 = List.of(film3);
+
+        filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"))));
+        filmStorage.createFilm(new Film("Ворона", "Фильм о белой вороне",
+                LocalDate.of(2001, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2"))));
+        filmStorage.createFilm(new Film("Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director"))));
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
+
+        filmStorage.putLike(3, 1L);
+        filmStorage.putLike(3, 2L);
+        filmStorage.putLike(3, 3L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 3L);
+        filmStorage.putLike(1, 2L);
+
+        Collection<Film> result = filmStorage.getPopularFilm(10,1, 0);
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByGenre1);
+
+        Collection<Film> result1 = filmStorage.getPopularFilm(10, 2, 0);
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByGenre2);
+    }
+
+    @DisplayName("Должен вернуть популярные фильмы по году")
+    @Test
+    void shouldReturnPopularFilmsByYear() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(3, "Director3"));
+
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+                LocalDate.of(2013, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2")));
+        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director")));
+        List<Film> listFilmsByYear1 = List.of(film1);
+        List<Film> listFilmsByYear2 = List.of(film3, film2);
+
+        filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"))));
+        filmStorage.createFilm(new Film("Ворона", "Фильм о белой вороне",
+                LocalDate.of(2013, 12, 30), 70,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2"))));
+        filmStorage.createFilm(new Film("Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director"))));
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
+
+        filmStorage.putLike(3, 1L);
+        filmStorage.putLike(3, 2L);
+        filmStorage.putLike(3, 3L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 3L);
+        filmStorage.putLike(1, 2L);
+
+        Collection<Film> result = filmStorage.getPopularFilm(10,0, 2001);
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByYear1);
+
+        Collection<Film> result1 = filmStorage.getPopularFilm(10, 0, 2013);
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByYear2);
+    }
+
+    @DisplayName("Должен вернуть популярные фильмы по году и id жанра")
+    @Test
+    void shouldReturnPopularFilmsByYearAndGenres() {
+        filmStorage.createDirector(new Director(1, "Director"));
+        filmStorage.createDirector(new Director(2, "Director2"));
+        filmStorage.createDirector(new Director(3, "Director3"));
+
+        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director")));
+        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+                LocalDate.of(2013, 12, 30), 70,
+                new RatingMpa(1, "G"),
+                List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2")));
+        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director")));
+        List<Film> listFilmsByGenreAndYear1 = List.of(film1);
+        List<Film> listFilmsByGenreAndYear2 = List.of(film3, film2);
+        List<Film> listFilmsByGenreAndYear3 = List.of(film2);
+
+        filmStorage.createFilm(new Film("Кот и пес", "Фильм о дружбе",
+                LocalDate.of(2001, 9, 3), 50,
+                new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
+                List.of(new Director(1, "Director"))));
+        filmStorage.createFilm(new Film("Ворона", "Фильм о белой вороне",
+                LocalDate.of(2013, 12, 30), 70,
+                new RatingMpa(1, "G"),
+                List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director"), new Director(2, "Director2"))));
+        filmStorage.createFilm(new Film("Пряник", "Фильм о прянике, который съели",
+                LocalDate.of(2013, 2, 17), 60,
+                new RatingMpa(2, "PG"),
+                List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
+                List.of(new Director(1, "Director"))));
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
+
+        filmStorage.putLike(3, 1L);
+        filmStorage.putLike(3, 2L);
+        filmStorage.putLike(3, 3L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 3L);
+        filmStorage.putLike(1, 2L);
+
+        Collection<Film> result = filmStorage.getPopularFilm(10,1, 2001);
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByGenreAndYear1);
+
+        Collection<Film> result1 = filmStorage.getPopularFilm(10, 3, 2013);
+        assertThat(result1)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByGenreAndYear2);
+
+        Collection<Film> result2 = filmStorage.getPopularFilm(10, 1, 2013);
+        assertThat(result2)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(listFilmsByGenreAndYear3);
+    }
 }
