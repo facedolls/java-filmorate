@@ -55,10 +55,6 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film createFilm(@Valid @RequestBody Film film) {
-        if (film.getId() != 0) {
-            log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
-            throw new ValidationException("id for the film must not be specified");
-        }
         return filmService.createFilm(film);
     }
 

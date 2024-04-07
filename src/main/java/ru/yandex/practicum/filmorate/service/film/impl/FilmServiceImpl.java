@@ -85,6 +85,10 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
+        if (film.getId() != 0) {
+            log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
+            throw new ValidationException("id for the film must not be specified");
+        }
         isExistsRatingMpa(film);
         isExistsGenres(film);
         film.getDirectors().forEach(director -> isExistsIdDirector(director.getId()));
