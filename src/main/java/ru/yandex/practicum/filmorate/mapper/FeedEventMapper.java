@@ -14,12 +14,12 @@ public class FeedEventMapper implements RowMapper<FeedEvent> {
     @Override
     public FeedEvent mapRow(ResultSet rs, int rowNum) throws SQLException {
         return FeedEvent.builder()
-                .eventId(rs.getInt("event_id"))
+                .eventId(rs.getLong("event_id"))
                 .timestamp(rs.getLong("timestamp"))
-                .userId(rs.getInt("user_id"))
+                .userId(rs.getLong("user_id"))
                 .eventType(EventType.valueOf(rs.getString("event_type")))
                 .operation(EventOperation.valueOf(rs.getString("operation")))
-                .entityId(rs.getInt("entity_id"))
+                .entityId(rs.getLong("entity_id"))
                 .build();
     }
 }
