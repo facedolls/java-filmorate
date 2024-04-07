@@ -28,16 +28,16 @@ public class ReviewStorageDbImpl implements ReviewStorage {
             "WHERE review_id = :reviewId";
     protected final String sqlDeleteReview = "DELETE FROM review WHERE review_id = :reviewId";
     protected final String sqlSelectIdReview = "SELECT review_id FROM review WHERE review_id = :reviewId";
-    protected final String sqlInsertReviewLike = "INSERT INTO review_likes VALUES (:reviewId, :userId)";
-    protected final String sqlInsertReviewDislike = "INSERT INTO review_dislikes VALUES (:reviewId, :userId)";
+    protected final String sqlInsertReviewLike = "INSERT INTO review_likes VALUES (:reviewId, :userId, TRUE)";
+    protected final String sqlInsertReviewDislike = "INSERT INTO review_likes VALUES (:reviewId, :userId, FALSE)";
     protected final String sqlDeleteReviewLike = "DELETE FROM review_likes WHERE review_id = :reviewId AND " +
-            "user_id = :userId";
-    protected final String sqlDeleteReviewDislike = "DELETE FROM review_dislikes WHERE review_id = :reviewId AND " +
-            "user_id = :userId";
+            "user_id = :userId AND is_like = TRUE";
+    protected final String sqlDeleteReviewDislike = "DELETE FROM review_likes WHERE review_id = :reviewId AND " +
+            "user_id = :userId AND is_like = FALSE";
     protected final String sqlSelectLike = "SELECT * FROM review_likes WHERE review_id = :reviewId AND " +
-            "user_id = :userId";
-    protected final String sqlSelectDislike = "SELECT * FROM review_dislikes WHERE review_id = :reviewId AND " +
-            "user_id = :userId";
+            "user_id = :userId AND is_like = TRUE";
+    protected final String sqlSelectDislike = "SELECT * FROM review_likes WHERE review_id = :reviewId AND " +
+            "user_id = :userId AND is_like = FALSE";
     protected final String sqlUpdateUseful = "UPDATE review SET useful = :useful WHERE review_id = :reviewId";
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;

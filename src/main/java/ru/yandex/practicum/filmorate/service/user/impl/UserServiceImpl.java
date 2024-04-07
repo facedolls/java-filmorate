@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
@@ -55,6 +56,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
+        if (user.getId() != 0) {
+            log.warn("Incorrect id={} was passed when creating the user: ", user.getId());
+            throw new ValidationException("id for the user must not be specified");
+        }
+
         setUserNameIfMissing(user);
         log.info("Create user {}", user);
         return userStorage.createUser(user);
@@ -117,6 +123,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Film> getRecommendationsFilms(Long id) {
+        log.info("Получение списка рекомендаций по фильмам для пользователя ");
         return userStorage.getRecommendationsFilms(id);
     }
 
