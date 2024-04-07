@@ -12,6 +12,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Review {
+    @NotNull
     private long reviewId;
     @NotNull
     private long filmId;
@@ -21,6 +22,7 @@ public class Review {
     @NotBlank
     @Size(max = 5000)
     private String content;
+    @NotNull
     private int useful;
 
     public Review(long reviewId, long filmId, long userId, boolean isPositive, String content) {
