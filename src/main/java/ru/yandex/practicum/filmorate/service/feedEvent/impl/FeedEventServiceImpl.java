@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.feedEvent;
+package ru.yandex.practicum.filmorate.service.feedEvent.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dao.feedEvent.FeedEventStorage;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
 import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
+import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 
 import java.time.Instant;
 import java.util.List;
