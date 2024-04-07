@@ -22,8 +22,4 @@ public interface ReviewService {
     String deleteDislike(Long id, Long userId);
 
     String deleteReview(Long id);
-
-    void isReviewExist(Long reviewId);
-
-    void isReviewValid(Review review);
 }

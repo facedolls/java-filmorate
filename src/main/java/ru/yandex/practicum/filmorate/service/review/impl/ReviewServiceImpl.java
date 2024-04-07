@@ -49,6 +49,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review createReview(Review review) {
+        if (review.getReviewId() != 0) {
+            log.warn("Incorrect id={} was passed when creating the review: ", review.getReviewId());
+            throw new ValidationException("id for the review must not be specified");
+        }
+        isReviewValid(review);
         userService.isExistsIdUser(review.getUserId());
         filmService.isExistsIdFilm(Long.valueOf(review.getFilmId()).intValue());
         Review createdReview = reviewStorage.createReview(review);
@@ -60,6 +65,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review updateReview(Review review) {
+        isReviewExist(review.getReviewId());
+        isReviewValid(review);
         userService.isExistsIdUser(review.getUserId());
         filmService.isExistsIdFilm(Long.valueOf(review.getFilmId()).intValue());
         Review updatedReview = reviewStorage.updateReview(review);
@@ -142,8 +149,7 @@ public class ReviewServiceImpl implements ReviewService {
         return String.format("Review with id=%d deleted", id);
     }
 
-    @Override
-    public void isReviewValid(Review review) {
+    private void isReviewValid(Review review) {
         if (review.getUserId() == 0) {
             log.warn("Incorrect userId={} was passed when creating the review: ", review.getUserId());
             throw new ValidationException("review must have userId");
@@ -160,7 +166,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    public void isReviewExist(Long reviewId) {
+    private void isReviewExist(Long reviewId) {
         boolean isExist = reviewStorage.isReviewExist(reviewId);
         if (!isExist) {
             log.warn("Review with id={} not found", reviewId);
