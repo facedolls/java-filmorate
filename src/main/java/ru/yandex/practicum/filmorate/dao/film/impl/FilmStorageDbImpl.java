@@ -42,7 +42,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
-            "GROUP BY f.film_id, rating_name " +
+            "GROUP BY f.film_id, rating_name, l.film_id " +
             "ORDER BY COUNT(l.user_id) DESC " +
             "LIMIT :count;";
     protected final String sqlSelectAllGenes = "SELECT * FROM genre ORDER BY genre_id;";
@@ -101,7 +101,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "JOIN film_director AS fd ON f.film_id = fd.film_id " +
             "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
             "WHERE director_id = :directorId " +
-            "GROUP BY f.film_id, rating_name " +
+            "GROUP BY f.film_id, rating_name, ff.film_id " +
             "ORDER BY COUNT(ff.film_id) DESC, f.film_id;";
     protected final String sqlSelectFilmsByDirectorAndYear = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
@@ -109,9 +109,12 @@ public class FilmStorageDbImpl implements FilmStorage {
             "WHERE director_id = :directorId " +
             "GROUP BY f.film_id, rating_name " +
             "ORDER BY release_date;";
-    protected final String sqlSelectFilmsByDirectorDirectors = "SELECT f.*, d.name FROM film_director AS f " +
-            "JOIN director AS d ON f.director_id = d.director_id " +
-            "WHERE d.director_id = :directorId;";
+    protected final String sqlSelectFilmsByDirectorDirectors = "SELECT ff.*, dd.name FROM film_director AS f " +
+            "LEFT JOIN director AS d ON f.director_id = d.director_id " +
+            "JOIN film_director AS ff ON f.film_id = ff.film_id " +
+            "LEFT JOIN director AS dd ON ff.director_id = dd.director_id " +
+            "WHERE d.director_id = :directorId " +
+            "ORDER BY ff.film_id, dd.director_id;";
     protected final String sqlSelectFilmsByDirectorGenres = "SELECT fg.*, g.name FROM film_genre AS fg " +
             "JOIN genre AS g ON fg.genre_id = g.genre_id " +
             "JOIN film_director AS ff ON fg.film_id = ff.film_id " +
@@ -123,7 +126,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
             "WHERE EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id, rating_name " +
+            "GROUP BY f.film_id, rating_name, l.film_id " +
             "ORDER BY COUNT(l.user_id) DESC " +
             "LIMIT :count;";
     protected final String sqlSelectGenresTopFilmsByYear = "WITH PopularFilms AS (SELECT f.film_id, " +
@@ -159,7 +162,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
             "JOIN film_genre AS g ON f.film_id = g.film_id " +
             "WHERE g.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id, rating_name " +
+            "GROUP BY f.film_id, rating_name, l.film_id " +
             "ORDER BY COUNT(f.film_id) DESC " +
             "LIMIT :count;";
     protected final String sqlSelectGenresTopFilmsByYearAndGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
@@ -197,8 +200,8 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
             "JOIN film_genre AS g ON f.film_id = g.film_id " +
             "WHERE g.genre_id = :genreId " +
-            "GROUP BY f.film_id, rating_name " +
-            "ORDER BY COUNT(f.film_id) DESC " +
+            "GROUP BY f.film_id, rating_name, l.film_id " +
+            "ORDER BY COUNT(f.film_id) DESC, l.film_id " +
             "LIMIT :count;";
     protected final String sqlSelectGenresTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
             "COUNT(ff.user_id) AS like_count " +
