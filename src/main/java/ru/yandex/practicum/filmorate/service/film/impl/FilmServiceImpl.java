@@ -247,7 +247,6 @@ public class FilmServiceImpl implements FilmService {
             } else if (by.equals("director")) {
                 return filmStorage.searchFilmsByDirector(query);
             } else {
-                System.out.println("Параметр поиска не определен!");
                 log.warn("The parameter {} is incorrect", by);
                 throw new ValidationException("The parameter " + by + " is incorrect");
             }

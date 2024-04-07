@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+ @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class FilmStorageDbImplTest {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
@@ -745,4 +745,117 @@ public class FilmStorageDbImplTest {
                 .usingRecursiveComparison()
                 .isEqualTo(listFilmsByGenreAndYear3);
     }
+
+    @DisplayName("Должен найти фильмы по названию")
+    @Test
+    public void shouldFindFilmByTitle() {
+        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+                LocalDate.of(2002, 11, 6), 110,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), new ArrayList<>());
+        Film film2 = new Film(2, "9 миля", "Томас Смит",
+                LocalDate.of(2002, 11, 6), 111,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), new ArrayList<>());
+
+        filmStorage.createFilm(film1);
+        filmStorage.createFilm(film2);
+        filmStorage.createFilm(film3);
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+
+        filmStorage.putLike(1, 1L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 2L);
+
+        List<Film> expectedResult = List.of(film2, film1);
+
+        List<Film> result = filmStorage.searchFilmsByTitle("мил");
+
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResult);
+    }
+
+    @DisplayName("Должен найти фильмы по режиссеру")
+    @Test
+    public void shouldFindFilmByDirector() {
+        filmStorage.createDirector(new Director(1, "Джимми Карлсон"));
+        filmStorage.createDirector(new Director(2, "Томас Карлсон"));
+
+        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+                LocalDate.of(2002, 11, 6), 110,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), List.of(new Director(1, "Джимми Карлсон")));
+        Film film2 = new Film(2, "9 миля", "Томас Смит",
+                LocalDate.of(2002, 11, 6), 111,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), List.of(new Director(2, "Томас Карлсон")));
+
+        filmStorage.createFilm(film1);
+        filmStorage.createFilm(film2);
+        filmStorage.createFilm(film3);
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+
+        filmStorage.putLike(1, 1L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 2L);
+
+        List<Film> expectedResult = List.of(film2, film1);
+        List<Film> result = filmStorage.searchFilmsByDirector("карл");
+
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResult);
+    }
+
+    @DisplayName("Должен найти фильмы по наименованию и режиссеру")
+    @Test
+    public void shouldFindFilmByTitleAndDirector() {
+        filmStorage.createDirector(new Director(1, "Джимми Карлсон"));
+        filmStorage.createDirector(new Director(2, "Томас Карлсон"));
+        filmStorage.createDirector(new Director(3, "Иван Петров"));
+
+        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+                LocalDate.of(2002, 11, 6), 110,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), List.of(new Director(1, "Джимми Карлсон")));
+        Film film2 = new Film(2, "9 миля", "Томас Смит",
+                LocalDate.of(2002, 11, 6), 111,
+                new RatingMpa(5, "NC-17"),
+                List.of(new Genre(1, "Комедия")), List.of(new Director(2, "Томас Карлсон")));
+        Film film3 = new Film(3,"Карлсон, который живет на крыше", "Сказка о карлсоне",
+                LocalDate.of(2010, 7, 3), 70, new RatingMpa(1, "G"),
+                List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")), List.of(new Director(3, "Иван Петров")));
+
+        filmStorage.createFilm(film1);
+        filmStorage.createFilm(film2);
+        filmStorage.createFilm(film3);
+        filmStorage.createFilm(film4);
+
+        userStorage.createUser(user1);
+        userStorage.createUser(user2);
+        userStorage.createUser(user3);
+
+        filmStorage.putLike(1, 1L);
+        filmStorage.putLike(2, 1L);
+        filmStorage.putLike(2, 2L);
+        filmStorage.putLike(3, 1L);
+        filmStorage.putLike(3, 2L);
+        filmStorage.putLike(3, 3L);
+
+        List<Film> expectedResult = List.of(film3, film2, film1);
+        List<Film> result = filmStorage.searchFilmsByTitleAndDirector("карл");
+
+        assertThat(result)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResult);
+    }
+
 }
