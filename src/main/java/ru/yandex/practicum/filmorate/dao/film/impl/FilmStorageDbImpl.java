@@ -200,7 +200,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
             "JOIN film_genre AS g ON f.film_id = g.film_id " +
             "WHERE g.genre_id = :genreId " +
-            "GROUP BY f.film_id, rating_name " +
+            "GROUP BY f.film_id, rating_name, l.film_id " +
             "ORDER BY COUNT(f.film_id) DESC " +
             "LIMIT :count;";
     protected final String sqlSelectGenresTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id, " +

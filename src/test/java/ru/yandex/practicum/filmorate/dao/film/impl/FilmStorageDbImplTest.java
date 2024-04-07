@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class FilmStorageDbImlTest {
+public class FilmStorageDbImplTest {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     private FilmStorage filmStorage;
