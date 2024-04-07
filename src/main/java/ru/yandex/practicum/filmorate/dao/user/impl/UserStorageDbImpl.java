@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.mapper.RecommendationMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.util.*;
 
 @Repository
