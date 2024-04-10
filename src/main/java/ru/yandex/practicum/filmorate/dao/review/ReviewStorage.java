@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.review;
 
 import ru.yandex.practicum.filmorate.model.Review;
+
 import java.util.Collection;
 
 public interface ReviewStorage {

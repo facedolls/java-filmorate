@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
-import java.sql.*;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class RatingMpaMapper implements RowMapper<RatingMpa> {
     @Override

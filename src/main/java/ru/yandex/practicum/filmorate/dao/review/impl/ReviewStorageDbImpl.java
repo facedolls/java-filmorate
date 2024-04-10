@@ -11,7 +11,10 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor

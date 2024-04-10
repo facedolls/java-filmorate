@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.review;
 
 import ru.yandex.practicum.filmorate.model.Review;
+
 import java.util.Collection;
 
 public interface ReviewService {

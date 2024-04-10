@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.feedEvent.FeedEventStorage;
-import ru.yandex.practicum.filmorate.model.feedEvent.*;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
+import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
+import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
+
 import java.time.Instant;
 import java.util.List;
 

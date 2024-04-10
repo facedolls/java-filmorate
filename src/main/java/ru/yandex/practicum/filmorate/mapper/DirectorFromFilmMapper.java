@@ -3,8 +3,13 @@ package ru.yandex.practicum.filmorate.mapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import ru.yandex.practicum.filmorate.model.Director;
-import java.sql.*;
-import java.util.*;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class DirectorFromFilmMapper implements ResultSetExtractor<Map<Long, List<Director>>> {
     private final Map<Long, List<Director>> directorsOfFilms = new HashMap<>();

@@ -2,9 +2,15 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import ru.yandex.practicum.filmorate.model.*;
-import java.sql.*;
-import java.util.*;
+import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RatingMpa;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecommendationMapper implements ResultSetExtractor<List<Film>> {
     private final List<Film> films = new ArrayList<>();
