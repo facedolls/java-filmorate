@@ -2,15 +2,9 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import ru.yandex.practicum.filmorate.model.*;
+import java.sql.*;
+import java.util.*;
 
 public class RecommendationMapper implements ResultSetExtractor<List<Film>> {
     private final List<Film> films = new ArrayList<>();
@@ -28,7 +22,7 @@ public class RecommendationMapper implements ResultSetExtractor<List<Film>> {
                 prepareForNewFilm();
             }
 
-            film.setId(rs.getInt("film_id"));
+            film.setId(rs.getLong("film_id"));
             film.setName(rs.getString("name"));
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());
@@ -60,15 +54,18 @@ public class RecommendationMapper implements ResultSetExtractor<List<Film>> {
 
     private boolean isDirectorOfThisFilm(ResultSet rs) throws SQLException {
         return rs.getInt("director_id") != 0 &&
-                !directors.contains(new Director(rs.getInt("director_id"), rs.getString("director_name")));
+                !directors.contains(new Director(rs.getInt("director_id"),
+                        rs.getString("director_name")));
     }
 
     private boolean isFullFilm(ResultSet rs) throws SQLException {
-        return rs.getInt("film_id") != film.getId() && film.getId() != 0;
+        Long filmId = film != null ? film.getId() : null;
+        Long resultSetFilmId = rs.getLong("film_id");
+        return filmId != null && !filmId.equals(resultSetFilmId);
     }
 
     private boolean isLastFilm(Film film) {
-        return film.getId() != 0;
+        return film.getId() != null;
     }
 
     private void prepareForNewFilm() {

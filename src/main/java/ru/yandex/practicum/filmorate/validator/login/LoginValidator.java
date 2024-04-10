@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.validator.login;
 
 import lombok.extern.slf4j.Slf4j;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import javax.validation.*;
 
 @Slf4j
 public class LoginValidator implements ConstraintValidator<Login, String> {

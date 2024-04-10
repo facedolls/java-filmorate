@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Review;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ReviewMapper implements RowMapper<Review> {
     @Override

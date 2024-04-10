@@ -4,18 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
-import ru.yandex.practicum.filmorate.mapper.RecommendationMapper;
-import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.mapper.*;
+import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 
 @Repository
@@ -128,14 +122,7 @@ public class UserStorageDbImpl implements UserStorage {
 
     @Override
     public List<Film> getRecommendationsFilms(Long id) {
-
-        if (id == null) {
-            throw new IncorrectParameterException("Null id ");
-        }
-
-        log.info("Запрос к db по user: {} ", id);
-
-        List<Integer> recommendationsFilmsId = jdbcTemplate.queryForList(
+        List<Long> recommendationsFilmsId = jdbcTemplate.queryForList(
                 "SELECT DISTINCT film_id FROM favorite_film " +
                         "JOIN (SELECT second_user.user_id, " +
                         "COUNT(second_user.film_id) AS count_films " +
@@ -152,9 +139,9 @@ public class UserStorageDbImpl implements UserStorage {
                         "WHERE user_id = ?))) AS user_top " +
                         "ON favorite_film.user_id = user_top.user_id " +
                         "WHERE favorite_film.film_id not IN (SELECT film_id FROM favorite_film " +
-                        "WHERE user_id = ?);", Integer.class, id, id, id, id);
+                        "WHERE user_id = ?);", Long.class, id, id, id, id);
 
-        if (recommendationsFilmsId.isEmpty()) {
+        if (recommendationsFilmsId.size() == 0) {
             return new ArrayList<>();
         }
 

@@ -7,16 +7,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
-import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.feedEvent.*;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        if (user.getId() != 0) {
+        if (user.getId() != null) {
             log.warn("Incorrect id={} was passed when creating the user: ", user.getId());
             throw new ValidationException("id for the user must not be specified");
         }
@@ -116,14 +111,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<FeedEvent> getFeedEventByUserId(long userId) {
+    public List<FeedEvent> getFeedEventByUserId(Long userId) {
         getUserById(userId);
         return feedEventService.getFeedEventByUserId(userId);
     }
 
     @Override
     public List<Film> getRecommendationsFilms(Long id) {
-        log.info("Получение списка рекомендаций по фильмам для пользователя ");
+        log.info("Запрос к db по user: {} ", id);
         return userStorage.getRecommendationsFilms(id);
     }
 

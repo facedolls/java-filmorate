@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.user;
 
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-
-import java.util.Collection;
-import java.util.List;
+import ru.yandex.practicum.filmorate.model.*;
+import java.util.*;
 
 public interface UserStorage {
     User getUserById(Long id);

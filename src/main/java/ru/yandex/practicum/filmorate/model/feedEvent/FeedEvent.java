@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.model.feedEvent;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder

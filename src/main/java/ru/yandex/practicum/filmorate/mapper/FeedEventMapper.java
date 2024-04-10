@@ -2,12 +2,8 @@ package ru.yandex.practicum.filmorate.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
-import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import ru.yandex.practicum.filmorate.model.feedEvent.*;
+import java.sql.*;
 
 @Service
 public class FeedEventMapper implements RowMapper<FeedEvent> {

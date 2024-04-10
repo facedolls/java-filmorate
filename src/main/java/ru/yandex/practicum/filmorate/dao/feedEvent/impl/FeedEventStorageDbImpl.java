@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.feedEvent.FeedEventStorage;
 import ru.yandex.practicum.filmorate.mapper.FeedEventMapper;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
-
 import java.util.List;
 
 @Slf4j
@@ -19,7 +18,7 @@ public class FeedEventStorageDbImpl implements FeedEventStorage {
     private final FeedEventMapper feedEventMapper;
 
     @Override
-    public List<FeedEvent> getFeedEventByUserId(long userId) {
+    public List<FeedEvent> getFeedEventByUserId(Long userId) {
         final String sql = "SELECT event_id, timestamp, user_id, event_type, operation, entity_id " +
                 "FROM feed " +
                 "WHERE user_id = ? ";

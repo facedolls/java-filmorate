@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.service.feedEvent;
 
-import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
-import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
-
+import ru.yandex.practicum.filmorate.model.feedEvent.*;
 import java.util.List;
 
 public interface FeedEventService {
-    List<FeedEvent> getFeedEventByUserId(long userId);
+    List<FeedEvent> getFeedEventByUserId(Long userId);
 
-    void addFeedEvent(long userId, EventType eventType, EventOperation eventOperation, long entityId);
+    void addFeedEvent(Long userId, EventType eventType, EventOperation eventOperation, Long entityId);
 }

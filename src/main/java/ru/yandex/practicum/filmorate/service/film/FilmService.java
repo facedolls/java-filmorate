@@ -1,14 +1,10 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-
+import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
 
 public interface FilmService {
-    Film getFilmById(Integer id);
+    Film getFilmById(Long id);
 
     Collection<Film> getAllFilms();
 
@@ -26,11 +22,11 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
-    Film putLike(Integer id, Long userId);
+    Film putLike(Long id, Long userId);
 
-    Film deleteLike(Integer id, Long userId);
+    Film deleteLike(Long id, Long userId);
 
-    String deleteFilm(Integer id);
+    String deleteFilm(Long id);
 
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 
@@ -46,7 +42,7 @@ public interface FilmService {
 
     String deleteDirector(Integer id);
 
-    void isExistsIdFilm(Integer filmId);
+    void isExistsIdFilm(Long filmId);
 
     Collection<Film> searchFilms(String query, String by);
 }

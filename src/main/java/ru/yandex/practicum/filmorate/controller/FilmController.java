@@ -7,12 +7,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 import java.util.Collection;
 
 @RestController
@@ -24,7 +20,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable @NotNull @Min(1) Integer id) {
+    public Film getFilmById(@PathVariable @NotNull @Min(1L) Long id) {
         return filmService.getFilmById(id);
     }
 
@@ -63,17 +59,17 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film putLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film putLike(@PathVariable @NotNull @Min(1L) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.putLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film deleteLike(@PathVariable @NotNull @Min(1L) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFilm(@PathVariable @NotNull @Min(1) Integer id) {
+    public String deleteFilm(@PathVariable @NotNull @Min(1L) Long id) {
         return filmService.deleteFilm(id);
     }
 

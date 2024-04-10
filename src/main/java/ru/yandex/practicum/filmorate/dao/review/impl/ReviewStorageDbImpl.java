@@ -11,10 +11,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -84,28 +81,28 @@ public class ReviewStorageDbImpl implements ReviewStorage {
     @Override
     public void addLike(Long id, Long userId) {
         parameter.update(sqlInsertReviewLike, Map.of("reviewId", id, "userId", userId));
-        int updatedUseful = getReviewById(id).getUseful() + 1;
+        Integer updatedUseful = getReviewById(id).getUseful() + 1;
         parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void addDislike(Long id, Long userId) {
         parameter.update(sqlInsertReviewDislike, Map.of("reviewId", id, "userId", userId));
-        int updatedUseful = getReviewById(id).getUseful() - 1;
+        Integer updatedUseful = getReviewById(id).getUseful() - 1;
         parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void deleteLike(Long id, Long userId) {
         parameter.update(sqlDeleteReviewLike, Map.of("reviewId", id, "userId", userId));
-        int updatedUseful = getReviewById(id).getUseful() - 1;
+        Integer updatedUseful = getReviewById(id).getUseful() - 1;
         parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 
     @Override
     public void deleteDislike(Long id, Long userId) {
         parameter.update(sqlDeleteReviewDislike, Map.of("reviewId", id, "userId", userId));
-        int updatedUseful = getReviewById(id).getUseful() + 1;
+        Integer updatedUseful = getReviewById(id).getUseful() + 1;
         parameter.update(sqlUpdateUseful, Map.of("useful", updatedUseful, "reviewId", id));
     }
 

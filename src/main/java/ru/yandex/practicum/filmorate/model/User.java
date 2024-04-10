@@ -1,22 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import ru.yandex.practicum.filmorate.validator.login.Login;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class User {
-    private long id;
+    private Long id;
     @NotBlank
     @Email
     private String email;

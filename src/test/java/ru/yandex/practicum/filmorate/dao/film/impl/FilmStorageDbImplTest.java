@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.film.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,12 +11,8 @@ import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.dao.user.impl.UserStorageDbImpl;
 import ru.yandex.practicum.filmorate.model.*;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
@@ -64,13 +58,13 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен создать фильм")
     @Test
     public void shouldCreateFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), new ArrayList<>());
         filmStorage.createFilm(film1);
 
-        Film result = filmStorage.getFilmsById(1);
+        Film result = filmStorage.getFilmsById(1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -80,13 +74,13 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен обновить фильм")
     @Test
     public void shouldUpdateFilm() {
-        Film filmForUpdate = new Film(1,"миля", "Смит",
+        Film filmForUpdate = new Film(1L,"миля", "Смит",
                 LocalDate.of(2003, 12, 7), 100,
                 new RatingMpa(2, "PG"), List.of(new Genre(2, "Драма")), new ArrayList<>());
         filmStorage.createFilm(film1);
         filmStorage.updateFilm(filmForUpdate);
 
-        Film result = filmStorage.getFilmsById(1);
+        Film result = filmStorage.getFilmsById(1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -96,18 +90,18 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен вернуть фильм по id")
     @Test
     public void shouldReturnFilmById() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110, new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), new ArrayList<>());
         filmStorage.createFilm(film1);
 
-        Film result1 = filmStorage.getFilmsById(1);
+        Film result1 = filmStorage.getFilmsById(1L);
         assertThat(result1)
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(film);
 
-        Film result2 = filmStorage.getFilmsById(84);
+        Film result2 = filmStorage.getFilmsById(84L);
         assertThat(result2)
                 .isNull();
     }
@@ -185,10 +179,10 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен вернуть 2 популярных фильма")
     @Test
     void shouldReturnPopularFilms() {
-        Film filmResult1 = new Film(1, "8 миля", "Джимми Смит",
+        Film filmResult1 = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
-        Film filmResult3 = new Film(3, "Веселые ребята", "Трое друзей отправляются в путешествие",
+        Film filmResult3 = new Film(3L, "Веселые ребята", "Трое друзей отправляются в путешествие",
                 LocalDate.of(2013, 4, 26), 80,
                 new RatingMpa(3, "PG-13"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
         List<Film> films = List.of(filmResult3, filmResult1);
@@ -201,12 +195,12 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(1, 3L);
-        filmStorage.putLike(4, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(1L, 3L);
+        filmStorage.putLike(4L, 2L);
 
         Collection<Film> result = filmStorage.getPopularFilm(2, 0, 0);
         assertThat(result)
@@ -218,14 +212,14 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен добавить лайк фильму с id = 1 от пользователя с id = 1")
     @Test
     void shouldPutLikeFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 
         filmStorage.createFilm(film1);
         userStorage.createUser(user1);
 
-        Film result = filmStorage.putLike(1, 1L);
+        Film result = filmStorage.putLike(1L, 1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -235,17 +229,17 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен удалить лайк фильму с id = 1 от пользователя с id = 1")
     @Test
     void shouldDeleteLikeFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 
         filmStorage.createFilm(film1);
         userStorage.createUser(user1);
         userStorage.createUser(user2);
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(1, 2L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(1L, 2L);
 
-        Film result = filmStorage.deleteLike(1, 1L);
+        Film result = filmStorage.deleteLike(1L, 1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -258,7 +252,7 @@ public class FilmStorageDbImplTest {
         List<Film> films = List.of(film2);
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
-        filmStorage.deleteFilm(1);
+        filmStorage.deleteFilm(1L);
 
         Collection<Film> result = filmStorage.getAllFilms();
         assertThat(result)
@@ -273,12 +267,12 @@ public class FilmStorageDbImplTest {
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
 
-        boolean resultFirst = filmStorage.isExistsIdFilm(1);
+        boolean resultFirst = filmStorage.isExistsIdFilm(1L);
         assertThat(resultFirst)
                 .isNotNull()
                 .isEqualTo(true);
 
-        boolean resultSecond = filmStorage.isExistsIdFilm(358);
+        boolean resultSecond = filmStorage.isExistsIdFilm(358L);
         assertThat(resultSecond)
                 .isNotNull()
                 .isEqualTo(false);
@@ -377,7 +371,7 @@ public class FilmStorageDbImplTest {
     @Test
     public void shouldCreateFilmWithDirector() {
         filmStorage.createDirector(new Director(1, "Director"));
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
@@ -398,7 +392,7 @@ public class FilmStorageDbImplTest {
     public void shouldUpdateFilmWithDirector() {
         filmStorage.createDirector(new Director(1, "Director"));
         filmStorage.createDirector(new Director(2, "Director2 super"));
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
@@ -413,12 +407,12 @@ public class FilmStorageDbImplTest {
                 .usingRecursiveComparison()
                 .isEqualTo(film1);
 
-        Film film2 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film2 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(2, "Director2 super")));
 
-        Film result2 = filmStorage.updateFilm(new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film result2 = filmStorage.updateFilm(new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(2, null))));
@@ -433,7 +427,7 @@ public class FilmStorageDbImplTest {
     @Test
     public void shouldRemoveDirectorFromFilms() {
         filmStorage.createDirector(new Director(1, "Director"));
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
@@ -448,13 +442,13 @@ public class FilmStorageDbImplTest {
                 .usingRecursiveComparison()
                 .isEqualTo(film1);
 
-        Film result2 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film result2 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 new ArrayList<>());
 
         filmStorage.deleteDirector(1);
-        Film film2 = filmStorage.getFilmsById(1);
+        Film film2 = filmStorage.getFilmsById(1L);
 
         assertThat(result2)
                 .isNotNull()
@@ -469,15 +463,15 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Director2"));
         filmStorage.createDirector(new Director(3, "Director3"));
 
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
-        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+        Film film2 = new Film(2L,"Ворона", "Фильм о белой вороне",
                 LocalDate.of(2001, 12, 30), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director"), new Director(2, "Director2")));
-        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+        Film film3 = new Film(3L,"Пряник", "Фильм о прянике, который съели",
                 LocalDate.of(2013, 2, 17), 60,
                 new RatingMpa(2, "PG"),
                 List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
@@ -513,15 +507,15 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Director2"));
         filmStorage.createDirector(new Director(3, "Director3"));
 
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
-        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+        Film film2 = new Film(2L,"Ворона", "Фильм о белой вороне",
                 LocalDate.of(2001, 12, 30), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director"), new Director(2, "Director2")));
-        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+        Film film3 = new Film(3L,"Пряник", "Фильм о прянике, который съели",
                 LocalDate.of(2013, 2, 17), 60,
                 new RatingMpa(2, "PG"),
                 List.of(new Genre(1, "Комедия"), new Genre(2, "Драма")),
@@ -547,11 +541,11 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 2L);
-        filmStorage.putLike(2, 3L);
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 2L);
+        filmStorage.putLike(2L, 3L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
 
         Collection<Film> films = filmStorage.getFilmsByDirector(1, "likes");
         assertThat(films)
@@ -567,15 +561,15 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Director2"));
         filmStorage.createDirector(new Director(3, "Director3"));
 
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
-        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+        Film film2 = new Film(2L,"Ворона", "Фильм о белой вороне",
                 LocalDate.of(2001, 12, 30), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director"), new Director(2, "Director2")));
-        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+        Film film3 = new Film(3L,"Пряник", "Фильм о прянике, который съели",
                 LocalDate.of(2013, 2, 17), 60,
                 new RatingMpa(2, "PG"),
                 List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
@@ -601,12 +595,12 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 3L);
-        filmStorage.putLike(1, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 3L);
+        filmStorage.putLike(1L, 2L);
 
         Collection<Film> result = filmStorage.getPopularFilm(10,1, 0);
         assertThat(result)
@@ -628,15 +622,15 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Director2"));
         filmStorage.createDirector(new Director(3, "Director3"));
 
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
-        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+        Film film2 = new Film(2L,"Ворона", "Фильм о белой вороне",
                 LocalDate.of(2013, 12, 30), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director"), new Director(2, "Director2")));
-        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+        Film film3 = new Film(3L,"Пряник", "Фильм о прянике, который съели",
                 LocalDate.of(2013, 2, 17), 60,
                 new RatingMpa(2, "PG"),
                 List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
@@ -662,12 +656,12 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 3L);
-        filmStorage.putLike(1, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 3L);
+        filmStorage.putLike(1L, 2L);
 
         Collection<Film> result = filmStorage.getPopularFilm(10,0, 2001);
         assertThat(result)
@@ -689,16 +683,16 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Director2"));
         filmStorage.createDirector(new Director(3, "Director3"));
 
-        Film film1 = new Film(1,"Кот и пес", "Фильм о дружбе",
+        Film film1 = new Film(1L,"Кот и пес", "Фильм о дружбе",
                 LocalDate.of(2001, 9, 3), 50,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")),
                 List.of(new Director(1, "Director")));
-        Film film2 = new Film(2,"Ворона", "Фильм о белой вороне",
+        Film film2 = new Film(2L,"Ворона", "Фильм о белой вороне",
                 LocalDate.of(2013, 12, 30), 70,
                 new RatingMpa(1, "G"),
                 List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")),
                 List.of(new Director(1, "Director"), new Director(2, "Director2")));
-        Film film3 = new Film(3,"Пряник", "Фильм о прянике, который съели",
+        Film film3 = new Film(3L,"Пряник", "Фильм о прянике, который съели",
                 LocalDate.of(2013, 2, 17), 60,
                 new RatingMpa(2, "PG"),
                 List.of(new Genre(2, "Драма"), new Genre(3, "Мультфильм")),
@@ -726,12 +720,12 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 3L);
-        filmStorage.putLike(1, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 3L);
+        filmStorage.putLike(1L, 2L);
 
         Collection<Film> result = filmStorage.getPopularFilm(10,1, 2001);
         assertThat(result)
@@ -755,11 +749,11 @@ public class FilmStorageDbImplTest {
     @DisplayName("Должен найти фильмы по названию")
     @Test
     public void shouldFindFilmByTitle() {
-        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+        Film film1 = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), new ArrayList<>());
-        Film film2 = new Film(2, "9 миля", "Томас Смит",
+        Film film2 = new Film(2L, "9 миля", "Томас Смит",
                 LocalDate.of(2002, 11, 6), 111,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), new ArrayList<>());
@@ -771,9 +765,9 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user1);
         userStorage.createUser(user2);
 
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 2L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 2L);
 
         List<Film> expectedResult = List.of(film2, film1);
 
@@ -791,11 +785,11 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(1, "Джимми Карлсон"));
         filmStorage.createDirector(new Director(2, "Томас Карлсон"));
 
-        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+        Film film1 = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), List.of(new Director(1, "Джимми Карлсон")));
-        Film film2 = new Film(2, "9 миля", "Томас Смит",
+        Film film2 = new Film(2L, "9 миля", "Томас Смит",
                 LocalDate.of(2002, 11, 6), 111,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), List.of(new Director(2, "Томас Карлсон")));
@@ -807,9 +801,9 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user1);
         userStorage.createUser(user2);
 
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 2L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 2L);
 
         List<Film> expectedResult = List.of(film2, film1);
         List<Film> result = filmStorage.searchFilmsByDirector("карл");
@@ -827,17 +821,18 @@ public class FilmStorageDbImplTest {
         filmStorage.createDirector(new Director(2, "Томас Карлсон"));
         filmStorage.createDirector(new Director(3, "Иван Петров"));
 
-        Film film1 = new Film(1, "8 миля", "Джимми Смит",
+        Film film1 = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), List.of(new Director(1, "Джимми Карлсон")));
-        Film film2 = new Film(2, "9 миля", "Томас Смит",
+        Film film2 = new Film(2L, "9 миля", "Томас Смит",
                 LocalDate.of(2002, 11, 6), 111,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")), List.of(new Director(2, "Томас Карлсон")));
-        Film film3 = new Film(3,"Карлсон, который живет на крыше", "Сказка о карлсоне",
+        Film film3 = new Film(3L,"Карлсон, который живет на крыше", "Сказка о карлсоне",
                 LocalDate.of(2010, 7, 3), 70, new RatingMpa(1, "G"),
-                List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")), List.of(new Director(3, "Иван Петров")));
+                List.of(new Genre(1, "Комедия"), new Genre(3, "Мультфильм")),
+                List.of(new Director(3, "Иван Петров")));
 
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
@@ -848,12 +843,12 @@ public class FilmStorageDbImplTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(2, 1L);
-        filmStorage.putLike(2, 2L);
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(2L, 1L);
+        filmStorage.putLike(2L, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
 
         List<Film> expectedResult = List.of(film3, film2, film1);
         List<Film> result = filmStorage.searchFilmsByTitleAndDirector("карл");
@@ -863,5 +858,4 @@ public class FilmStorageDbImplTest {
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResult);
     }
-
 }
