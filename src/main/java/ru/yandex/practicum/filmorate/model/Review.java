@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -12,49 +11,46 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Review {
+    private Long reviewId;
     @NotNull
-    private long reviewId;
+    private Long filmId;
     @NotNull
-    private long filmId;
+    private Long userId;
     @NotNull
-    private long userId;
     private Boolean isPositive;
     @NotBlank
     @Size(max = 5000)
     private String content;
-    @NotNull
-    private int useful;
+    private Integer useful = 0;
 
-    public Review(long reviewId, long filmId, long userId, boolean isPositive, String content) {
-        this.reviewId = reviewId;
+    public Review(Long filmId, Long userId, Boolean isPositive, String content) {
         this.filmId = filmId;
         this.userId = userId;
         this.isPositive = isPositive;
         this.content = content;
-        this.useful = 0;
     }
 
-    public long getReviewId() {
+    public Long getReviewId() {
         return this.reviewId;
     }
 
-    public void setReviewId(long reviewId) {
+    public void setReviewId(Long reviewId) {
         this.reviewId = reviewId;
     }
 
-    public @NotNull long getFilmId() {
+    public @NotNull Long getFilmId() {
         return this.filmId;
     }
 
-    public void setFilmId(@NotNull long filmId) {
+    public void setFilmId(@NotNull Long filmId) {
         this.filmId = filmId;
     }
 
-    public @NotNull long getUserId() {
+    public @NotNull Long getUserId() {
         return this.userId;
     }
 
-    public void setUserId(@NotNull long userId) {
+    public void setUserId(@NotNull Long userId) {
         this.userId = userId;
     }
 
@@ -62,7 +58,7 @@ public class Review {
         return this.isPositive;
     }
 
-    public void setIsPositive(boolean isPositive) {
+    public void setIsPositive(Boolean isPositive) {
         this.isPositive = isPositive;
     }
 
@@ -74,11 +70,11 @@ public class Review {
         this.content = content;
     }
 
-    public int getUseful() {
+    public Integer getUseful() {
         return this.useful;
     }
 
-    public void setUseful(int useful) {
+    public void setUseful(Integer useful) {
         this.useful = useful;
     }
 
@@ -87,14 +83,14 @@ public class Review {
         if (!(o instanceof Review)) return false;
         final Review other = (Review) o;
         if (!other.canEqual(this)) return false;
-        if (this.getReviewId() != other.getReviewId()) return false;
-        if (this.getFilmId() != other.getFilmId()) return false;
-        if (this.getUserId() != other.getUserId()) return false;
+        if (!this.getReviewId().equals(other.getReviewId())) return false;
+        if (!this.getFilmId().equals(other.getFilmId())) return false;
+        if (!this.getUserId().equals(other.getUserId())) return false;
         if (this.getIsPositive() != other.getIsPositive()) return false;
         final Object this$content = this.getContent();
         final Object other$content = other.getContent();
         if (!Objects.equals(this$content, other$content)) return false;
-        return this.getUseful() == other.getUseful();
+        return this.getUseful().equals(other.getUseful());
     }
 
     protected boolean canEqual(final Object other) {
@@ -118,6 +114,8 @@ public class Review {
     }
 
     public String toString() {
-        return "Review(reviewId=" + this.getReviewId() + ", filmId=" + this.getFilmId() + ", userId=" + this.getUserId() + ", isPositive=" + this.getIsPositive() + ", content=" + this.getContent() + ", useful=" + this.getUseful() + ")";
+        return "Review(reviewId=" + this.getReviewId() + ", filmId=" + this.getFilmId() + ", userId=" +
+                this.getUserId() + ", isPositive=" + this.getIsPositive() + ", content=" + this.getContent() +
+                ", useful=" + this.getUseful() + ")";
     }
 }

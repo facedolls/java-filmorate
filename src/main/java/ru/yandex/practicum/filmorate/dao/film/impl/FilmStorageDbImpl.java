@@ -274,7 +274,7 @@ public class FilmStorageDbImpl implements FilmStorage {
     private final NamedParameterJdbcOperations parameter;
 
     @Override
-    public Film getFilmsById(Integer id) {
+    public Film getFilmsById(Long id) {
         Map<String, Object> params = Map.of("filmId", id);
         List<Film> film = parameter.query(sqlSelectOneFilm, params, new FilmMapper());
 
@@ -343,7 +343,7 @@ public class FilmStorageDbImpl implements FilmStorage {
                 .usingGeneratedKeyColumns("film_id");
 
         Map<String, Object> params = getFilmParams(film);
-        film.setId(insertFilm.executeAndReturnKey(params).intValue());
+        film.setId(insertFilm.executeAndReturnKey(params).longValue());
         updateGenre(film);
         updateDirectorFromFilm(film);
         return getFilmsById(film.getId());
@@ -351,7 +351,8 @@ public class FilmStorageDbImpl implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        Map<String, Object> params = getFilmParams(film);
+        Map<String, Object> params = new HashMap<>(getFilmParams(film));
+        params.put("filmId", film.getId());
         parameter.update(sqlUpdateFilm, params);
         parameter.update(sqlDeleteGenresFilm, Map.of("filmId", film.getId()));
         parameter.update(sqlDeleteDirectorsFilm, Map.of("filmId", film.getId()));
@@ -362,25 +363,25 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     @Override
-    public Film putLike(Integer id, Long userId) {
+    public Film putLike(Long id, Long userId) {
         parameter.update(sqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
         parameter.update(sqlInsertLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
-    public Film deleteLike(Integer id, Long userId) {
+    public Film deleteLike(Long id, Long userId) {
         parameter.update(sqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
-    public void deleteFilm(Integer id) {
+    public void deleteFilm(Long id) {
         parameter.update(sqlDeleteFilm, Map.of("filmId", id));
     }
 
     @Override
-    public boolean isExistsIdFilm(Integer filmId) {
+    public boolean isExistsIdFilm(Long filmId) {
         List<Object> id = parameter.query(sqlSelectIdFilm, Map.of("filmId", filmId),
                 (rs, rowNum) -> rs.getInt("film_id"));
         return id.size() == 1;
@@ -467,15 +468,15 @@ public class FilmStorageDbImpl implements FilmStorage {
 
     private List<Film> setFilmsWithGenresAndDirectors(List<Film> films, Map<String, Object> params,
                                                       String sqlGenres, String sqlDirectors) {
-        Map<Integer, List<Genre>> genres = parameter.query(sqlGenres, params, new GenreFromFilmMapper());
+        Map<Long, List<Genre>> genres = parameter.query(sqlGenres, params, new GenreFromFilmMapper());
         films = setGenresFilms(films, genres);
 
-        Map<Integer, List<Director>> directors = parameter.query(sqlDirectors, params, new DirectorFromFilmMapper());
+        Map<Long, List<Director>> directors = parameter.query(sqlDirectors, params, new DirectorFromFilmMapper());
         films = setDirectorsFilms(films, directors);
         return films;
     }
 
-    private List<Film> setGenresFilms(List<Film> films, Map<Integer, List<Genre>> genres) {
+    private List<Film> setGenresFilms(List<Film> films, Map<Long, List<Genre>> genres) {
         if (genres != null) {
             return films.stream()
                     .map(film -> {
@@ -489,7 +490,7 @@ public class FilmStorageDbImpl implements FilmStorage {
         return films;
     }
 
-    private List<Film> setDirectorsFilms(List<Film> films, Map<Integer, List<Director>> directors) {
+    private List<Film> setDirectorsFilms(List<Film> films, Map<Long, List<Director>> directors) {
         if (directors != null) {
             return films.stream()
                     .map(film -> {
@@ -515,7 +516,7 @@ public class FilmStorageDbImpl implements FilmStorage {
     private Map<String, Object> getFilmParams(Film film) {
         return Map.of("name", film.getName(), "description", film.getDescription(),
                 "release_date", film.getReleaseDate(), "duration", film.getDuration(),
-                "rating_id", film.getMpa().getId(), "filmId", film.getId());
+                "rating_id", film.getMpa().getId());
     }
 
     private void updateGenre(Film film) {
@@ -544,10 +545,10 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     public List<Film> joinGenresAndDirectorToFilm(List<Film> films) {
-        Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
+        Map<Long, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
         films = setGenresFilms(films, genres);
 
-        Map<Integer, List<Director>> directors = parameter.query(sqlSelectDirectorsAllFilms,
+        Map<Long, List<Director>> directors = parameter.query(sqlSelectDirectorsAllFilms,
                 new DirectorFromFilmMapper());
         films = setDirectorsFilms(films, directors);
         return films;

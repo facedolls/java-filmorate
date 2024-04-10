@@ -19,7 +19,7 @@ public class FeedEventStorageDbImpl implements FeedEventStorage {
     private final FeedEventMapper feedEventMapper;
 
     @Override
-    public List<FeedEvent> getFeedEventByUserId(long userId) {
+    public List<FeedEvent> getFeedEventByUserId(Long userId) {
         final String sql = "SELECT event_id, timestamp, user_id, event_type, operation, entity_id " +
                 "FROM feed " +
                 "WHERE user_id = ? ";

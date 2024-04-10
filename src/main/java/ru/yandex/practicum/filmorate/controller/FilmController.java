@@ -24,7 +24,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable @NotNull @Min(1) Integer id) {
+    public Film getFilmById(@PathVariable @NotNull @Min(1L) Long id) {
         return filmService.getFilmById(id);
     }
 
@@ -63,17 +63,17 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film putLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film putLike(@PathVariable @NotNull @Min(1L) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.putLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film deleteLike(@PathVariable @NotNull @Min(1L) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFilm(@PathVariable @NotNull @Min(1) Integer id) {
+    public String deleteFilm(@PathVariable @NotNull @Min(1L) Long id) {
         return filmService.deleteFilm(id);
     }
 

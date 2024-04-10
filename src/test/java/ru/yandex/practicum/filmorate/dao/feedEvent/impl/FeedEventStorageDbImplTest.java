@@ -9,7 +9,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dao.feedEvent.FeedEventStorage;
 import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.yandex.practicum.filmorate.model.feedEvent.EventOperation.ADD;
 import static ru.yandex.practicum.filmorate.model.feedEvent.EventType.FRIEND;

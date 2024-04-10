@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service.user.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,11 +12,8 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -47,7 +42,7 @@ public class UserServiceImplTest {
     @DisplayName("Не должен обновить пользователя с несуществующим id")
     @Test
     public void shouldNotUpdateUser() {
-        User user = new User(55,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+        User user = new User(55L,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
         UserNotFoundException exception = assertThrows(
                 UserNotFoundException.class,

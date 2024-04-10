@@ -28,7 +28,7 @@ public interface UserService {
 
     void isExistsIdUser(Long userId);
 
-    List<FeedEvent> getFeedEventByUserId(long userId);
+    List<FeedEvent> getFeedEventByUserId(Long userId);
 
     List<Film> getRecommendationsFilms(Long id);
 }

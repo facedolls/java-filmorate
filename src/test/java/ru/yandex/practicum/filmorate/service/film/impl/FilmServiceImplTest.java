@@ -1,29 +1,20 @@
 package ru.yandex.practicum.filmorate.service.film.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -46,7 +37,7 @@ public class FilmServiceImplTest {
     public void shouldNotFindTheFilmId() {
         FilmNotFoundException exception = assertThrows(
                 FilmNotFoundException.class,
-                () -> filmService.getFilmById(25)
+                () -> filmService.getFilmById(25L)
         );
         assertEquals("Film with id=25 not found", exception.getMessage());
     }
@@ -74,7 +65,7 @@ public class FilmServiceImplTest {
     @DisplayName("Не должен обновить фильм и должен выдать исключение FilmNotFoundException")
     @Test
     public void shouldNotUpdateFilmDueToNonExistentId() {
-        Film film = new Film(60,"60", "60",
+        Film film = new Film(60L,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 
@@ -89,7 +80,7 @@ public class FilmServiceImplTest {
     @Test
     public void shouldNotUpdateFilmDueToNonExistentRatingMpa() {
         filmService.createFilm(film1);
-        Film film = new Film(1,"60", "60",
+        Film film = new Film(1L,"60", "60",
                 LocalDate.of(2000, 12, 12), 60,
                 new RatingMpa(1000, "GKLJH"), List.of(new Genre(1, "Комедия")), new ArrayList<>());
 

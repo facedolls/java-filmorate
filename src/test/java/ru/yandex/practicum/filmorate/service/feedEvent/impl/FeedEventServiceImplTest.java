@@ -6,19 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
-import ru.yandex.practicum.filmorate.model.feedEvent.FeedEvent;
+import ru.yandex.practicum.filmorate.model.feedEvent.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.yandex.practicum.filmorate.model.feedEvent.EventOperation.ADD;
-import static ru.yandex.practicum.filmorate.model.feedEvent.EventOperation.REMOVE;
-import static ru.yandex.practicum.filmorate.model.feedEvent.EventType.FRIEND;
-import static ru.yandex.practicum.filmorate.model.feedEvent.EventType.LIKE;
+import static ru.yandex.practicum.filmorate.model.feedEvent.EventOperation.*;
+import static ru.yandex.practicum.filmorate.model.feedEvent.EventType.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -34,13 +28,13 @@ public class FeedEventServiceImplTest {
 
     @Test
     void addAndDeleteLikesTest() {
-        filmService.putLike(1, 1L);
-        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1);
+        filmService.putLike(1L, 1L);
+        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1L);
         FeedEvent feedEvent = feedEvents1.get(0);
         assertFieldsOfFeedEvent(feedEvent, 1L, 1L, LIKE, ADD, 1L);
 
-        filmService.deleteLike(1, 1L);
-        List<FeedEvent> feedEvents2 = userService.getFeedEventByUserId(1);
+        filmService.deleteLike(1L, 1L);
+        List<FeedEvent> feedEvents2 = userService.getFeedEventByUserId(1L);
         assertThat(feedEvents2.size()).isEqualTo(2);
 
         FeedEvent feedEvent1 = feedEvents2.get(0);
@@ -52,14 +46,14 @@ public class FeedEventServiceImplTest {
     @Test
     void addAndDeleteFriendFeedEventTest() {
         userService.addInFriend(1L, 2L);
-        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1);
+        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1L);
         assertThat(feedEvents1.size()).isEqualTo(1);
 
         FeedEvent feedEvent = feedEvents1.get(0);
         assertFieldsOfFeedEvent(feedEvent, 1L, 1L, FRIEND, ADD, 2L);
 
         userService.deleteFromFriends(1L, 2L);
-        List<FeedEvent> feedEvents2 = userService.getFeedEventByUserId(1);
+        List<FeedEvent> feedEvents2 = userService.getFeedEventByUserId(1L);
         assertThat(feedEvents2.size()).isEqualTo(2);
 
         FeedEvent feedEvent1 = feedEvents2.get(0);
@@ -70,15 +64,15 @@ public class FeedEventServiceImplTest {
 
     @Test
     void emptyFeedEventTest() {
-        List<FeedEvent> feedEvent = userService.getFeedEventByUserId(1);
+        List<FeedEvent> feedEvent = userService.getFeedEventByUserId(1L);
         assertThat(feedEvent.isEmpty()).isTrue();
     }
 
     @Test
     void addLikeAndFriendTest() {
         userService.addInFriend(1L, 2L);
-        filmService.putLike(1, 1L);
-        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1);
+        filmService.putLike(1L, 1L);
+        List<FeedEvent> feedEvents1 = userService.getFeedEventByUserId(1L);
         assertThat(feedEvents1.size()).isEqualTo(2);
 
         FeedEvent feedEvent1 = feedEvents1.get(0);

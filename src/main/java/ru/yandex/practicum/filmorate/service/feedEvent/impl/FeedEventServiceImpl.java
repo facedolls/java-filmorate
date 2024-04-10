@@ -22,13 +22,13 @@ public class FeedEventServiceImpl implements FeedEventService {
     private final FeedEventStorage feedEventStorage;
 
     @Override
-    public List<FeedEvent> getFeedEventByUserId(long userId) {
+    public List<FeedEvent> getFeedEventByUserId(Long userId) {
         log.info("user event feed with userId = {}", userId);
         return feedEventStorage.getFeedEventByUserId(userId);
     }
 
     @Override
-    public void addFeedEvent(long userId, EventType eventType, EventOperation eventOperation, long entityId) {
+    public void addFeedEvent(Long userId, EventType eventType, EventOperation eventOperation, Long entityId) {
         FeedEvent feedEvent = FeedEvent.builder()
                 .timestamp(Instant.now().toEpochMilli())
                 .userId(userId)

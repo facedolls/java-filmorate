@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface FilmStorage {
-    Film getFilmsById(Integer id);
+    Film getFilmsById(Long id);
 
     Collection<Film> getAllFilms();
 
@@ -27,13 +27,13 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    void deleteFilm(Integer id);
+    void deleteFilm(Long id);
 
-    Film putLike(Integer id, Long userId);
+    Film putLike(Long id, Long userId);
 
-    Film deleteLike(Integer id, Long userId);
+    Film deleteLike(Long id, Long userId);
 
-    boolean isExistsIdFilm(Integer filmId);
+    boolean isExistsIdFilm(Long filmId);
 
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 

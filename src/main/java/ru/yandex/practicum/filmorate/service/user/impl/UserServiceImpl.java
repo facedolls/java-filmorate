@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        if (user.getId() != 0) {
+        if (user.getId() != null) {
             log.warn("Incorrect id={} was passed when creating the user: ", user.getId());
             throw new ValidationException("id for the user must not be specified");
         }
@@ -116,14 +116,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<FeedEvent> getFeedEventByUserId(long userId) {
+    public List<FeedEvent> getFeedEventByUserId(Long userId) {
         getUserById(userId);
         return feedEventService.getFeedEventByUserId(userId);
     }
 
     @Override
     public List<Film> getRecommendationsFilms(Long id) {
-        log.info("Получение списка рекомендаций по фильмам для пользователя ");
+        log.info("Запрос к db по user: {} ", id);
         return userStorage.getRecommendationsFilms(id);
     }
 

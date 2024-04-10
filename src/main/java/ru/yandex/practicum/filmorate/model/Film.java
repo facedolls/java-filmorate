@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Film {
-    private int id;
+    private Long id;
     @NotBlank
     private String name;
     @NotBlank
@@ -30,13 +30,13 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull
     @Positive
-    private int duration;
+    private Integer duration;
     @NotNull
     private RatingMpa mpa;
     private List<Genre> genres = new ArrayList<>();
     private List<Director> directors = new ArrayList<>();
 
-    public Film(String name, String description, LocalDate releaseDate, int duration,
+    public Film(String name, String description, LocalDate releaseDate, Integer duration,
                 RatingMpa mpa, List<Genre> genres, List<Director> directors) {
         this.name = name;
         this.description = description;

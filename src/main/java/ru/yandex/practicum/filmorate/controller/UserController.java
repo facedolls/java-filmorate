@@ -74,13 +74,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
-    public List<FeedEvent> getFeedEventByUserId(@PathVariable Long id) {
+    public List<FeedEvent> getFeedEventByUserId(@PathVariable @NotNull Long id) {
         return userService.getFeedEventByUserId(id);
     }
 
     @GetMapping("/{id}/recommendations")
     @ResponseBody
-    public List<Film> getRecommendationsFilms(@PathVariable Long id) {
+    public Collection<Film> getRecommendationsFilms(@PathVariable @NotNull Long id) {
         return userService.getRecommendationsFilms(id);
     }
 }
