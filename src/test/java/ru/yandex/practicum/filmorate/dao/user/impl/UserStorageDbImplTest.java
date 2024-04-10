@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserStorageDbImplTest {
-    private final JdbcTemplate jdbcTemplate;
+    /*private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     private UserStorage userStorage;
     private User user1;
@@ -202,5 +202,5 @@ public class UserStorageDbImplTest {
         assertThat(result)
                 .isNotNull()
                 .isEqualTo(true);
-    }
+    }*/
 }

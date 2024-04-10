@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS review_dislikes CASCADE;
 DROP TABLE IF EXISTS director CASCADE;
 DROP TABLE IF EXISTS film_director CASCADE;
 DROP TABLE IF EXISTS feed CASCADE;
+DROP TABLE IF EXISTS film_mark CASCADE;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -68,9 +69,19 @@ CREATE TABLE IF NOT EXISTS favorite_film
 (
     film_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
+    grade INTEGER NOT NULL CHECK(grade >= 0 AND grade <= 10),
+    is_positive BOOLEAN NOT NULL,
     PRIMARY KEY (film_id, user_id),
     FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS film_mark
+(
+    film_id INTEGER NOT NULL UNIQUE,
+    mark NUMERIC(4, 2) NOT NULL,
+    PRIMARY KEY (film_id, mark),
+    FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS review
@@ -120,3 +131,25 @@ CREATE TABLE IF NOT EXISTS feed
     entity_id  INTEGER     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION update_film_mark() RETURNS TRIGGER AS
+'
+DECLARE
+    new_mark FLOAT;
+BEGIN
+    SELECT AVG(grade) INTO new_mark FROM favorite_film WHERE film_id = NEW.film_id;
+    IF new_mark IS NOT NULL THEN
+        INSERT INTO film_mark (film_id, mark)
+        VALUES (NEW.film_id, new_mark)
+        ON CONFLICT (film_id)
+        DO UPDATE SET mark = EXCLUDED.mark;
+    END IF;
+    RETURN NEW;
+END;
+'
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_after_grade_change
+AFTER INSERT OR UPDATE OF grade ON favorite_film
+FOR EACH ROW
+EXECUTE FUNCTION update_film_mark();
