@@ -30,9 +30,9 @@
 
 **ER-диаграмма базы данных:**
 
-![database ER-diagram](./src/main/resources/diagram-db.png)
+![database ER-diagram](./src/main/resources/diagram.png)
 
-Ссылка на актуальную версию диаграммы: [dbdiagram.io](https://dbdiagram.io/d/filmorate_java_group_5-34_project-6612ec4e03593b6b6167206d)
+Ссылка на актуальную версию диаграммы: [dbdiagram.io](https://dbdiagram.io/d/Copy-of-filmorate_java_group_5-34_project-6618499d03593b6b61cb08a8)
 
 ### Примеры SQL-запросов и результатов для основных операций приложения java-filmorate.
 

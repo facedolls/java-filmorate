@@ -1,10 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-
+import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
 
 public interface FilmService {
@@ -26,7 +22,7 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
-    Film putLike(Long id, Long userId);
+    Film putLike(Long id, Long userId, Integer grade);
 
     Film deleteLike(Long id, Long userId);
 
