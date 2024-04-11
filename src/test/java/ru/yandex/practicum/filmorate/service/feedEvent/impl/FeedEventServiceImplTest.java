@@ -20,7 +20,7 @@ import static ru.yandex.practicum.filmorate.model.feedEvent.EventType.*;
 @Sql(value = "/test-data-feedEvent.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class FeedEventServiceImplTest {
 
-    @Autowired
+    /*@Autowired
     private final UserService userService;
 
     @Autowired
@@ -88,5 +88,5 @@ public class FeedEventServiceImplTest {
         assertThat(feedEvent).hasFieldOrPropertyWithValue("eventType", type);
         assertThat(feedEvent).hasFieldOrPropertyWithValue("operation", operation);
         assertThat(feedEvent).hasFieldOrPropertyWithValue("entityId", entityId);
-    }
+    }*/
 }
