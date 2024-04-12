@@ -8,11 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
 import ru.yandex.practicum.filmorate.mapper.*;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-
+import ru.yandex.practicum.filmorate.model.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,7 +50,8 @@ public class FilmStorageDbImpl implements FilmStorage {
             "WHERE film_id = :filmId;";
     protected final String sqlDeleteGenresFilm = "DELETE FROM film_genre WHERE film_id = :filmId;";
     protected final String sqlInsertGenresFilm = "INSERT INTO film_genre VALUES (:filmId, :genreId);";
-    protected final String sqlInsertLikeFilm = "INSERT INTO favorite_film VALUES (:filmId, :userId);";
+    protected final String sqlInsertLikeFilm = "INSERT INTO favorite_film VALUES " +
+            "(:filmId, :userId, :grade, :isPositive);";
     protected final String sqlDeleteLikeFilm = "DELETE FROM favorite_film " +
             "WHERE film_id = :filmId AND user_id = :userId;";
     protected final String sqlDeleteFilm = "DELETE FROM film WHERE film_id = :filmId;";
@@ -363,9 +360,11 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     @Override
-    public Film putLike(Long id, Long userId) {
+    public Film putLike(Long id, Long userId, Integer grade) {
         parameter.update(sqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
-        parameter.update(sqlInsertLikeFilm, Map.of("filmId", id, "userId", userId));
+        boolean isPositive = grade > 5 && grade <= 10;
+        parameter.update(sqlInsertLikeFilm, Map.of("filmId", id, "userId", userId, "grade", grade,
+                    "isPositive", isPositive));
         return getFilmsById(id);
     }
 

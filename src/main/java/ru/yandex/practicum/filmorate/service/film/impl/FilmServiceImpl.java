@@ -5,19 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventOperation;
-import ru.yandex.practicum.filmorate.model.feedEvent.EventType;
+import ru.yandex.practicum.filmorate.exception.*;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.feedEvent.*;
 import ru.yandex.practicum.filmorate.service.feedEvent.FeedEventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
-
 import java.util.Collection;
 
 @Service
@@ -146,11 +139,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film putLike(Long id, Long userId) {
+    public Film putLike(Long id, Long userId, Integer grade) {
         isExistsIdFilm(id);
         feedEventService.addFeedEvent(userId, EventType.LIKE, EventOperation.ADD, id);
         log.info("User userId={} liked the film id={}", userId, id);
-        return filmStorage.putLike(id, userId);
+        return filmStorage.putLike(id, userId, grade);
     }
 
     @Override

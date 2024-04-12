@@ -1,12 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.film;
 
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-
-import java.util.Collection;
-import java.util.List;
+import ru.yandex.practicum.filmorate.model.*;
+import java.util.*;
 
 public interface FilmStorage {
     Film getFilmsById(Long id);
@@ -29,7 +24,7 @@ public interface FilmStorage {
 
     void deleteFilm(Long id);
 
-    Film putLike(Long id, Long userId);
+    Film putLike(Long id, Long userId, Integer grade);
 
     Film deleteLike(Long id, Long userId);
 
