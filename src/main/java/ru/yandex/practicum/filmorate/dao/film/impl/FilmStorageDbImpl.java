@@ -33,13 +33,13 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id " +
             "ORDER BY g.genre_id;";
-    protected final String sqlSelectPopularsFilms = "SELECT f.*, r.name AS rating_name, " +
-            "COUNT(l.user_id) AS count_likes " +
+    protected final String sqlSelectPopularsFilms = "SELECT f.*, r.name AS rating_name " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
-            "GROUP BY f.film_id, rating_name, l.film_id " +
-            "ORDER BY COUNT(l.user_id) DESC " +
+            "LEFT JOIN film_mark AS fm ON f.film_id = fm.film_id " +
+            "GROUP BY f.film_id, fm.mark, rating_name " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count;";
     protected final String sqlSelectAllGenes = "SELECT * FROM genre ORDER BY genre_id;";
     protected final String sqlSelectAllRatingMpa = "SELECT * FROM rating ORDER BY rating_id;";
@@ -56,18 +56,18 @@ public class FilmStorageDbImpl implements FilmStorage {
             "WHERE film_id = :filmId AND user_id = :userId;";
     protected final String sqlDeleteFilm = "DELETE FROM film WHERE film_id = :filmId;";
     protected final String sqlSelectIdFilm = "SELECT film_id FROM film WHERE film_id = :filmId;";
-    protected final String sqlSelectPopularFilmsGenres = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectPopularFilmsGenres = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fg.film_id, g.genre_id, g.name " +
             "FROM PopularFilms pf " +
             "JOIN film_genre fg ON pf.film_id = fg.film_id " +
             "JOIN genre g ON fg.genre_id = g.genre_id " +
-            "ORDER BY fg.film_id, g.genre_id;";
+            "ORDER BY pf.film_id, g.genre_id;";
     protected final String sqlSelectDirectorsToOneFilm = "SELECT f.*, d.name " +
             "FROM film_director AS f " +
             "JOIN director AS d ON f.director_id = d.director_id " +
@@ -75,12 +75,12 @@ public class FilmStorageDbImpl implements FilmStorage {
     protected final String sqlSelectDirectorsAllFilms = "SELECT f.*, d.name " +
             "FROM film_director AS f " +
             "JOIN director AS d ON f.director_id = d.director_id;";
-    protected final String sqlSelectPopularFilmsDirectors = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectPopularFilmsDirectors = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fd.film_id, d.director_id, d.name " +
             "FROM PopularFilms pf " +
@@ -117,111 +117,111 @@ public class FilmStorageDbImpl implements FilmStorage {
             "JOIN film_director AS ff ON fg.film_id = ff.film_id " +
             "JOIN director AS d ON d.director_id = ff.director_id " +
             "WHERE d.director_id = :directorId;";
-    protected final String sqlSelectTopFilmsByYear = "SELECT f.*, r.name AS rating_name, " +
-            "COUNT(l.user_id) AS count_likes " +
+    protected final String sqlSelectTopFilmsByYear = "SELECT f.*, r.name AS rating_name " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "LEFT JOIN film_mark AS fm ON l.film_id = fm.film_id " +
             "WHERE EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id, rating_name, l.film_id " +
-            "ORDER BY COUNT(l.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark, rating_name " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count;";
-    protected final String sqlSelectGenresTopFilmsByYear = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectGenresTopFilmsByYear = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fg.film_id, g.genre_id, g.name " +
             "FROM PopularFilms pf " +
             "JOIN film_genre fg ON pf.film_id = fg.film_id " +
             "JOIN genre g ON fg.genre_id = g.genre_id " +
             "ORDER BY fg.film_id, g.genre_id;";
-    protected final String sqlSelectDirectorsTopFilmsByYear = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectDirectorsTopFilmsByYear = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fd.film_id, d.director_id, d.name " +
             "FROM PopularFilms pf " +
             "JOIN film_director fd ON pf.film_id = fd.film_id " +
             "JOIN director d ON fd.director_id = d.director_id " +
             "ORDER BY fd.film_id, d.director_id;";
-    protected final String sqlSelectTopFilmsByYearAndGenre = "SELECT f.*, r.name AS rating_name, " +
-            "COUNT(l.user_id) AS count_likes " +
+    protected final String sqlSelectTopFilmsByYearAndGenre = "SELECT f.*, r.name AS rating_name " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "LEFT JOIN film_mark AS fm ON l.film_id = fm.film_id " +
             "JOIN film_genre AS g ON f.film_id = g.film_id " +
             "WHERE g.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id, rating_name, l.film_id " +
-            "ORDER BY COUNT(f.film_id) DESC " +
+            "GROUP BY fm.mark, f.film_id, rating_name " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count;";
-    protected final String sqlSelectGenresTopFilmsByYearAndGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectGenresTopFilmsByYearAndGenre = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
             "JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE fg.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fg.film_id, g.genre_id, g.name " +
             "FROM PopularFilms pf " +
             "JOIN film_genre fg ON pf.film_id = fg.film_id " +
             "JOIN genre g ON fg.genre_id = g.genre_id " +
             "ORDER BY fg.film_id, g.genre_id;";
-    protected final String sqlSelectDirectorsTopFilmsByYearAndGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectDirectorsTopFilmsByYearAndGenre = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
             "JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE fg.genre_id = :genreId AND EXTRACT(YEAR FROM release_date) = :year " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fd.film_id, d.director_id, d.name " +
             "FROM PopularFilms pf " +
             "JOIN film_director fd ON pf.film_id = fd.film_id " +
             "JOIN director d ON fd.director_id = d.director_id " +
             "ORDER BY fd.film_id, d.director_id;";
-    protected final String sqlSelectTopFilmsByGenre = "SELECT f.*, r.name AS rating_name, " +
-            "COUNT(l.user_id) AS count_likes " +
+    protected final String sqlSelectTopFilmsByGenre = "SELECT f.*, r.name AS rating_name " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
+            "LEFT JOIN film_mark AS fm ON f.film_id = fm.film_id " +
             "JOIN film_genre AS g ON f.film_id = g.film_id " +
             "WHERE g.genre_id = :genreId " +
-            "GROUP BY f.film_id, rating_name, l.film_id " +
-            "ORDER BY COUNT(f.film_id) DESC, l.film_id " +
+            "GROUP BY f.film_id, fm.mark, rating_name " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count;";
-    protected final String sqlSelectGenresTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectGenresTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
             "JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE fg.genre_id = :genreId " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fg.film_id, g.genre_id, g.name " +
             "FROM PopularFilms pf " +
             "JOIN film_genre fg ON pf.film_id = fg.film_id " +
             "JOIN genre g ON fg.genre_id = g.genre_id " +
             "ORDER BY fg.film_id, g.genre_id;";
-    protected final String sqlSelectDirectorsTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id, " +
-            "COUNT(ff.user_id) AS like_count " +
+    protected final String sqlSelectDirectorsTopFilmsByGenre = "WITH PopularFilms AS (SELECT f.film_id " +
             "FROM film f " +
             "LEFT JOIN favorite_film ff ON f.film_id = ff.film_id " +
             "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE fg.genre_id = :genreId " +
-            "GROUP BY f.film_id " +
-            "ORDER BY COUNT(ff.user_id) DESC " +
+            "GROUP BY f.film_id, fm.mark " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id " +
             "LIMIT :count) " +
             "SELECT fd.film_id, d.director_id, d.name " +
             "FROM PopularFilms pf " +
