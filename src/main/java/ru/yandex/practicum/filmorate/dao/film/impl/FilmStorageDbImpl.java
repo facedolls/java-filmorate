@@ -97,9 +97,10 @@ public class FilmStorageDbImpl implements FilmStorage {
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "JOIN film_director AS fd ON f.film_id = fd.film_id " +
             "LEFT JOIN favorite_film AS ff ON f.film_id = ff.film_id " +
+            "LEFT JOIN film_mark AS fm ON ff.film_id = fm.film_id " +
             "WHERE director_id = :directorId " +
-            "GROUP BY f.film_id, rating_name, ff.film_id " +
-            "ORDER BY COUNT(ff.film_id) DESC, f.film_id;";
+            "GROUP BY f.film_id, fm.film_id, rating_name " +
+            "ORDER BY fm.mark DESC NULLS LAST, f.film_id;";
     protected final String sqlSelectFilmsByDirectorAndYear = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "JOIN film_director AS fd ON f.film_id = fd.film_id " +
@@ -116,8 +117,10 @@ public class FilmStorageDbImpl implements FilmStorage {
             "JOIN genre AS g ON fg.genre_id = g.genre_id " +
             "JOIN film_director AS ff ON fg.film_id = ff.film_id " +
             "JOIN director AS d ON d.director_id = ff.director_id " +
-            "WHERE d.director_id = :directorId;";
-    protected final String sqlSelectTopFilmsByYear = "SELECT f.*, r.name AS rating_name " +
+            "WHERE d.director_id = :directorId " +
+            "ORDER BY fg.film_id, g.genre_id;";
+    protected final String sqlSelectTopFilmsByYear = "SELECT f.*, r.name AS rating_name, " +
+            "COUNT(l.user_id) AS count_likes " +
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
