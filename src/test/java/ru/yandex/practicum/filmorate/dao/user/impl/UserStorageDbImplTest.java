@@ -4,20 +4,45 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserStorageDbImplTest {
-    /*private final JdbcTemplate jdbcTemplate;
+    @Container
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
+            .withPassword("inmemory")
+            .withUsername("inmemory");
+
+    @DynamicPropertySource
+    static void postgresqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    }
+
+    @PersistenceContext
+    private EntityManager em;
+
+    private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
     private UserStorage userStorage;
     private User user1;
@@ -26,6 +51,7 @@ public class UserStorageDbImplTest {
 
     @BeforeEach
     public void setUp() {
+        em.flush();
         userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
         user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
@@ -38,6 +64,7 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен создать пользователя")
     @Test
     public void shouldCreateUser() {
+        em.flush();
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
         userStorage.createUser(user1);
@@ -202,5 +229,5 @@ public class UserStorageDbImplTest {
         assertThat(result)
                 .isNotNull()
                 .isEqualTo(true);
-    }*/
+    }
 }
