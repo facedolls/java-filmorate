@@ -4,11 +4,11 @@ import ru.yandex.practicum.filmorate.model.*;
 import java.util.Collection;
 
 public interface FilmService {
-    Film getFilmById(Integer id);
+    Film getFilmById(Long id);
 
     Collection<Film> getAllFilms();
 
-    Collection<Film> getPopularFilm(Integer count);
+    Collection<Film> getPopularFilm(Integer count, Integer genreId, Integer year);
 
     Collection<Genre> getAllGenres();
 
@@ -22,9 +22,27 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
-    Film putLike(Integer id, Long userId);
+    Film putLike(Long id, Long userId, Integer grade);
 
-    Film deleteLike(Integer id, Long userId);
+    Film deleteLike(Long id, Long userId);
 
-    String deleteFilm(Integer id);
+    String deleteFilm(Long id);
+
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
+
+    Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    Collection<Director> getAllDirectors();
+
+    Director getDirectorById(Integer id);
+
+    Director createDirector(Director director);
+
+    Director updateDirector(Director director);
+
+    String deleteDirector(Integer id);
+
+    void isExistsIdFilm(Long filmId);
+
+    Collection<Film> searchFilms(String query, String by);
 }

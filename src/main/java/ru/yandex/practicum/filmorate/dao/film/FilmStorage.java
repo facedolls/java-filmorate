@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.dao.film;
 
 import ru.yandex.practicum.filmorate.model.*;
-import java.util.Collection;
+import java.util.*;
 
 public interface FilmStorage {
-    Film getFilmsById(Integer id);
+    Film getFilmsById(Long id);
 
     Collection<Film> getAllFilms();
 
-    Collection<Film> getPopularFilm(Integer count);
+    Collection<Film> getPopularFilm(Integer count, Integer genreId, Integer year);
 
     Collection<Genre> getAllGenres();
 
@@ -22,11 +22,31 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    void deleteFilm(Integer id);
+    void deleteFilm(Long id);
 
-    Film putLike(Integer id, Long userId);
+    Film putLike(Long id, Long userId, Integer grade);
 
-    Film deleteLike(Integer id, Long userId);
+    Film deleteLike(Long id, Long userId);
 
-    boolean isExistsIdFilm(Integer filmId);
+    boolean isExistsIdFilm(Long filmId);
+
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
+
+    Collection<Film> getFilmsByDirector(Integer directorId, String sortBy);
+
+    Collection<Director> getAllDirectors();
+
+    Director getDirectorById(Integer directorId);
+
+    Director createDirector(Director director);
+
+    Director updateDirector(Director director);
+
+    void deleteDirector(Integer directorId);
+
+    List<Film> searchFilmsByTitle(String query);
+
+    List<Film> searchFilmsByDirector(String query);
+
+    List<Film> searchFilmsByTitleAndDirector(String query);
 }

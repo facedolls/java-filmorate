@@ -1,9 +1,38 @@
-# java-filmorate
-_Это шаблон приложения, которое работает с фильмами и оценками пользователей._
+# java-filmorate backend
+
+*Java приложение (Spring Boot, Maven, Rest API, H2)*
+
+Сервис, работает с фильмами и оценками пользователей, возвращает топ фильмов, рекомендованных к просмотру
+
+В API доступна следующая функциональность: 
+1. пользователи (эндпоинт ```/users```):
+- получение пользователя по id: ```GET /users/{id}```
+- получение всех пользователей ```GET /users```
+- получение списка друзей ```GET /users/{id}/friends```
+- получение списка общих друзей у двух пользователей ```GET /users/{id}/friends/common/{otherId}```
+- создание пользователя ```POST /users```
+- обновление пользователя ```PUT /users```
+- добавление пользователя в друзья ```PUT /users/{id}/friends/{friendId}```
+- удаление пользователя из друзей ```DELETE /users/{id}/friends/{friendId}```
+- удаление пользоватея ```DELETE /users/{id}```
+- получение ленты событий для пользователя ```GET /users/{id}/feed```
+- получения списка рекомендованных фильмов ```GET /users/{id}/recommendations```
+
++ "Фильмы по режиссёрам"
++ "Отзывы" на фильмы
++ "Удаление фильмов и пользователей"
++ "Поиск"
++ "Общие фильмы"
++ "Рекомендации"
++ "Лента событий"
++ "Популярные фильмы"
+
 
 **ER-диаграмма базы данных:**
 
-![database ER-diagram](src/main/resources/diagram.png)
+![database ER-diagram](./src/main/resources/diagram.png)
+
+Ссылка на актуальную версию диаграммы: [dbdiagram.io](https://dbdiagram.io/d/Copy-of-filmorate_java_group_5-34_project-6618499d03593b6b61cb08a8)
 
 ### Примеры SQL-запросов и результатов для основных операций приложения java-filmorate.
 
@@ -648,7 +677,7 @@ VALUES (4, 1);
 
 INSERT INTO film_genre ("film_id", "genre_id")
 VALUES (5, 1);
-
+    
 INSERT INTO favorite_film ("film_id", "user_id")
 VALUES (5, 1);
 
